@@ -133,6 +133,18 @@
   line-height: 1.25;
 }
 
+/* Soporte y contraste garantizado para Autocompletado del Navegador (Chrome / Edge / Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #0F172A !important;
+  -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
+  box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
+  caret-color: #0F172A !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 @media (min-width: 640px) {
   .justi-input,
   .justi-select {
@@ -289,6 +301,17 @@ html.dark body {
 .dark .justi-select:focus {
   border-color: #60A5FA;
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover, 
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-text-fill-color: #F8FAFC !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1E293B inset !important;
+  box-shadow: 0 0 0px 1000px #1E293B inset !important;
+  caret-color: #F8FAFC !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .dark .justi-bottom-action-box {

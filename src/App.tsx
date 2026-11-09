@@ -21,47 +21,18 @@ import { TesoreriaView } from './modules/treasury/TesoreriaView';
 import { MasterControlView } from './modules/master/MasterControlView';
 import { UsuariosView } from './modules/users/UsuariosView';
 import { ProductosView } from './modules/products/ProductosView';
+import { useTheme } from './hooks/useTheme';
+import { useAuthSession } from './hooks/useAuthSession';
 
-const SESSION_STORAGE_KEY = 'justi_pos_session_v1';
 const CATALOG_CACHE_KEY = 'justi_pos_catalog_cache_v1';
 const REGISTERS_STORAGE_KEY = 'justi_pos_registers_v1';
 
 export const App: React.FC = () => {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem('justi_theme_v1');
-      if (saved) return saved === 'dark';
-      return (
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-      );
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('justi_theme_v1', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('justi_theme_v1', 'light');
-    }
-  }, [isDark]);
-
-  const toggleDarkMode = () => setIsDark((prev) => !prev);
-
-  const [session, setSession] = useState<LoginResponse | null>(() => {
-    try {
-      const saved = localStorage.getItem(SESSION_STORAGE_KEY);
-      return saved ? (JSON.parse(saved) as LoginResponse) : null;
-    } catch {
-      return null;
-    }
-  });
-
+  const { isDark, toggleDarkMode } = useTheme();
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>('BIENVENIDO');
+  const { session, handleLoginSuccess, handleLogout } =
+    useAuthSession(setActiveScreen);
+
   const [tesoreriaTab, setTesoreriaTab] = useState<TesoreriaTab>('CAJAS');
   const [consumidorFinalMode, setConsumidorFinalMode] =
     useState<boolean>(false);
@@ -162,20 +133,6 @@ export const App: React.FC = () => {
       syncTreasury(session.accessToken);
     }
   }, [session?.accessToken, session?.user.role, syncCatalog, syncTreasury]);
-
-  const handleLoginSuccess = (newSession: LoginResponse) => {
-    setSession(newSession);
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newSession));
-    setActiveScreen(
-      newSession.user.role === 'CRM' ? 'CLIENTES' : 'BIENVENIDO',
-    );
-  };
-
-  const handleLogout = () => {
-    setSession(null);
-    localStorage.removeItem(SESSION_STORAGE_KEY);
-    setActiveScreen('BIENVENIDO');
-  };
 
   const handleNavigate = (
     screen: ActiveScreen,
