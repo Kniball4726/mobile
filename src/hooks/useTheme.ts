@@ -19,9 +19,11 @@ export function useTheme() {
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
       localStorage.setItem(THEME_STORAGE_KEY, 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
       localStorage.setItem(THEME_STORAGE_KEY, 'light');
     }
   }, [isDark]);

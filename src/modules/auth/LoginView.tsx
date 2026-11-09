@@ -19,6 +19,26 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isDarkMode =
+    typeof isDark === 'boolean'
+      ? isDark
+      : typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark');
+
+  const inputStyle: React.CSSProperties = isDarkMode
+    ? {
+        backgroundColor: '#1E293B',
+        color: '#FFFFFF',
+        borderColor: '#475569',
+        colorScheme: 'dark',
+      }
+    : {
+        backgroundColor: '#FFFFFF',
+        color: '#0F172A',
+        borderColor: '#94A3B8',
+        colorScheme: 'light',
+      };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -101,7 +121,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="justi-input w-full sm:w-60 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 font-medium"
+              style={inputStyle}
+              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors"
               placeholder="usuario@justi.com.ar"
             />
           </div>
@@ -116,7 +137,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="justi-input w-full sm:w-60 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 font-medium"
+              style={inputStyle}
+              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors"
               placeholder="••••••••••"
             />
           </div>
