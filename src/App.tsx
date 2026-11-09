@@ -27,6 +27,31 @@ const CATALOG_CACHE_KEY = 'justi_pos_catalog_cache_v1';
 const REGISTERS_STORAGE_KEY = 'justi_pos_registers_v1';
 
 export const App: React.FC = () => {
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('justi_theme_v1');
+      if (saved) return saved === 'dark';
+      return (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      );
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('justi_theme_v1', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('justi_theme_v1', 'light');
+    }
+  }, [isDark]);
+
+  const toggleDarkMode = () => setIsDark((prev) => !prev);
+
   const [session, setSession] = useState<LoginResponse | null>(() => {
     try {
       const saved = localStorage.getItem(SESSION_STORAGE_KEY);
@@ -291,7 +316,13 @@ export const App: React.FC = () => {
   };
 
   if (!session) {
-    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <LoginView
+        onLoginSuccess={handleLoginSuccess}
+        isDark={isDark}
+        onToggleDarkMode={toggleDarkMode}
+      />
+    );
   }
 
   return (
@@ -301,6 +332,8 @@ export const App: React.FC = () => {
         activeScreen={activeScreen}
         tesoreriaTab={tesoreriaTab}
         isCajaOpen={isVentasSucursalOpen}
+        isDark={isDark}
+        onToggleDarkMode={toggleDarkMode}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
       />

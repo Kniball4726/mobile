@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { AuthApi } from '../../services/api.service';
 import { LoginResponse } from '../../types/domain.types';
+import { Sun, Moon } from 'lucide-react';
 
 interface LoginViewProps {
   onLoginSuccess: (session: LoginResponse) => void;
+  isDark?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
-export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
+export const LoginView: React.FC<LoginViewProps> = ({
+  onLoginSuccess,
+  isDark,
+  onToggleDarkMode,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +38,22 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#E8F2FC] flex flex-col">
+    <div className="min-h-screen w-full bg-[#E8F2FC] flex flex-col relative">
+      {onToggleDarkMode && (
+        <button
+          type="button"
+          onClick={onToggleDarkMode}
+          className="absolute top-4 right-4 p-2 rounded-full border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-800 shadow-sm hover:scale-105 transition"
+          title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
+        >
+          {isDark ? (
+            <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Moon className="h-4 w-4 text-slate-700" />
+          )}
+        </button>
+      )}
+
       <div className="w-full bg-[#DCEAF7] border-b border-[#C6DDF2] pt-6 pb-4 px-4 flex flex-col items-center">
         <img
           src="/justi-logo.svg"

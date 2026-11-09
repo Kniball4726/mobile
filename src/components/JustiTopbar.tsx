@@ -24,6 +24,8 @@ import {
   UserCheck,
   Building2,
   CheckCircle2,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 interface JustiTopbarProps {
@@ -31,6 +33,8 @@ interface JustiTopbarProps {
   activeScreen: ActiveScreen;
   tesoreriaTab: TesoreriaTab;
   isCajaOpen: boolean;
+  isDark?: boolean;
+  onToggleDarkMode?: () => void;
   onNavigate: (screen: ActiveScreen, tesoreriaTab?: TesoreriaTab) => void;
   onLogout: () => void;
 }
@@ -39,6 +43,8 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   user,
   activeScreen,
   isCajaOpen,
+  isDark = false,
+  onToggleDarkMode,
   onNavigate,
   onLogout,
 }) => {
@@ -381,6 +387,23 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 : `${user.branch || 'LOCALES'} • OFFLINE`}
             </span>
 
+            {/* Botón Dark Mode Toggle en Topbar */}
+            {onToggleDarkMode && (
+              <button
+                type="button"
+                onClick={onToggleDarkMode}
+                className="p-1 sm:p-1.5 rounded-md hover:bg-white/15 text-white flex items-center justify-center transition active:scale-90"
+                title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
+                aria-label="Alternar modo oscuro"
+              >
+                {isDark ? (
+                  <Sun className="h-4 w-4 text-amber-300 animate-in spin-in-90 duration-200" />
+                ) : (
+                  <Moon className="h-4 w-4 text-white/90" />
+                )}
+              </button>
+            )}
+
             {/* Menú de Usuario */}
             <div className="relative">
               <button
@@ -717,20 +740,46 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 )}
               </nav>
 
-              {/* Pie del Drawer: Cerrar Sesión y Versión */}
-              <div className="p-3 border-t border-slate-200 bg-slate-50 space-y-2">
+              {/* Pie del Drawer: Tema, Cerrar Sesión y Versión */}
+              <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-2">
+                {onToggleDarkMode && (
+                  <button
+                    type="button"
+                    onClick={onToggleDarkMode}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-md font-semibold text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 transition shadow-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {isDark ? (
+                        <Sun className="h-4 w-4 text-amber-400" />
+                      ) : (
+                        <Moon className="h-4 w-4 text-indigo-600" />
+                      )}
+                      <span>Modo {isDark ? 'Oscuro' : 'Claro'}</span>
+                    </div>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider ${
+                        isDark
+                          ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                          : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                      }`}
+                    >
+                      {isDark ? 'ACTIVADO' : 'DESACTIVADO'}
+                    </span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
                     setIsDrawerOpen(false);
                     onLogout();
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs border border-red-200 transition"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 font-bold text-xs border border-red-200 dark:border-red-900 transition"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Cerrar Sesión</span>
                 </button>
-                <div className="text-center text-[10px] text-slate-500">
+                <div className="text-center text-[10px] text-slate-500 dark:text-slate-400">
                   JustiMobile POS & CRM • v1.2.0
                 </div>
               </div>

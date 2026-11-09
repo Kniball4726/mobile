@@ -212,3 +212,127 @@
     display: none !important;
   }
 }
+
+/* =========================================================================
+   SOPORTE COMPLETO MODO OSCURO (DARK MODE)
+   ========================================================================= */
+html.dark,
+html.dark body {
+  background-color: #0F172A;
+  color: #F1F5F9;
+}
+
+.dark .justi-topbar {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border-bottom: 1px solid #334155;
+}
+
+.dark .justi-nav-pill {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border-color: #334155;
+  color: #93C5FD;
+}
+
+.dark .justi-nav-pill:hover {
+  background: linear-gradient(180deg, #334155 0%, #1E293B 100%);
+}
+
+.dark .justi-nav-pill-active {
+  background: #1E293B;
+  border-color: #F97316;
+  color: #FB923C;
+}
+
+.dark .justi-title-strip {
+  background-color: #1E293B;
+  border-bottom: 1px solid #334155;
+  color: #60A5FA;
+}
+
+.dark .justi-filter-bar {
+  background-color: #1E293B;
+  border-color: #334155;
+  color: #E2E8F0;
+}
+
+.dark .justi-section-header {
+  background: linear-gradient(180deg, #1E3A8A 0%, #172554 100%);
+  border-bottom: 1px solid #1E293B;
+}
+
+.dark .justi-totals-strip {
+  background-color: #1E293B;
+  border-color: #334155;
+}
+
+.dark .justi-btn,
+.dark .justi-btn-primary {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border-color: #334155;
+  color: #93C5FD;
+}
+
+.dark .justi-btn:hover:not(:disabled),
+.dark .justi-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #334155 0%, #1E293B 100%);
+  border-color: #475569;
+}
+
+.dark .justi-input,
+.dark .justi-select {
+  background-color: #1E293B;
+  border-color: #475569;
+  color: #F8FAFC;
+}
+
+.dark .justi-input:focus,
+.dark .justi-select:focus {
+  border-color: #60A5FA;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.dark .justi-bottom-action-box {
+  background-color: #1E293B;
+  border-color: #334155;
+}
+
+.dark .justi-table-row-even {
+  background-color: #1E293B;
+  color: #E2E8F0;
+}
+
+.dark .justi-table-row-odd {
+  background-color: #0F172A;
+  color: #E2E8F0;
+}
+
+.dark .justi-alert-error {
+  background-color: #450A0A;
+  border-color: #7F1D1D;
+  color: #FCA5A5;
+}
+
+.dark .justi-alert-success {
+  background-color: #064E3B;
+  border-color: #065F46;
+  color: #6EE7B7;
+}
+
+/* Modificadores globales para transicionar fondos y bordes en Dark Mode */
+.dark .bg-\[\#E8F2FC\],
+.dark .bg-\[\#F7FBFF\],
+.dark .bg-\[\#E6F0FA\] {
+  background-color: #0F172A !important;
+}
+
+.dark .bg-\[\#DCEAF7\],
+.dark .bg-\[\#E8ECF8\],
+.dark .bg-\[\#F5FAFF\] {
+  background-color: #1E293B !important;
+}
+
+.dark .border-\[\#80AED8\],
+.dark .border-\[\#9CC2E5\],
+.dark .border-\[\#B8D4EC\] {
+  border-color: #334155 !important;
+}
