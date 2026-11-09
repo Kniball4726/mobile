@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #E8F2FC;
+    color: #1E293B;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Barra superior azul institucional (#5492C6) - Capturas 2 y 3 */
+.justi-topbar {
+  background: linear-gradient(180deg, #5B9BD0 0%, #4B88BC 100%);
+  border-bottom: 1px solid #3A72A3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Píldoras de navegación superior (Inicio | Ventas-Cobros ▾ | Tesorería ▾) */
+.justi-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #EAF4FC 0%, #D4E8FA 100%);
+  border: 1px solid #A3C8EA;
+  color: #1B5E91;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.justi-nav-pill:hover {
+  background: linear-gradient(180deg, #F5FAFF 0%, #DFEFFC 100%);
+}
+
+/* Estado activo naranja como en Captura 3 ("Ventas-Cobros ▾") */
+.justi-nav-pill-active {
+  background: #FFFFFF;
+  border-color: #7FB2E0;
+  color: #E66000;
+}
+
+/* Franja de título de pantalla (Bienvenido, Nueva Venta, Clientes, Apertura de Caja) */
+.justi-title-strip {
+  width: 100%;
+  background-color: #DCEAF7;
+  border-bottom: 1px solid #C2DAEE;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1B5E91;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 640px) {
+  .justi-title-strip {
+    font-size: 21px;
+    padding: 9px 16px;
+  }
+}
+
+/* Barra de filtros gris-beige (#B7B2A3) - Capturas 5 y 7 */
+.justi-filter-bar {
+  background-color: #B7B2A3;
+  border: 1px solid #9E9989;
+  color: #FFFFFF;
+  padding: 8px 10px;
+}
+
+/* Cabecera azul de sección (Artículos Vendidos, Formas de Pago) - Captura 4 */
+.justi-section-header {
+  background: linear-gradient(180deg, #5897CA 0%, #4886B9 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 10px;
+  text-align: center;
+  border-bottom: 1px solid #3A72A3;
+}
+
+/* Franja azul de Totales (#80AED8) - Captura 4 */
+.justi-totals-strip {
+  background-color: #80AED8;
+  border-top: 1px solid #6397C7;
+  border-bottom: 1px solid #6397C7;
+}
+
+/* Botón primario clásico estilo JUSTI Gestión */
+.justi-btn,
+.justi-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #F4F9FD 0%, #D4E7F7 100%);
+  border: 1px solid #9BBCE0;
+  color: #1B5688;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 11px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.justi-btn:hover:not(:disabled),
+.justi-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #E5F1FB 0%, #BFE0F8 100%);
+  border-color: #6B9FD4;
+}
+
+.justi-btn:active:not(:disabled),
+.justi-btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Inputs y Selects responsivos (16px en móvil para evitar zoom automático en iOS/Android) */
+.justi-input,
+.justi-select {
+  border: 1px solid #94A3B8;
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+@media (min-width: 640px) {
+  .justi-input,
+  .justi-select {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
+
+.justi-input:focus,
+.justi-select:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* Caja azul inferior para botones Guardar / Cancelar - Capturas 4, 6, 8, 9 */
+.justi-bottom-action-box {
+  background-color: #5492C6;
+  border: 1px solid #3E7BB0;
+  border-radius: 4px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Alertas estilo Justi (Captura 4 alerta roja de Caja Cerrada) */
+.justi-alert-error {
+  background-color: #FDE8E8;
+  border: 1px solid #F8B4B4;
+  color: #C81E1E;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.justi-alert-success {
+  background-color: #DEF7EC;
+  border: 1px solid #84E1BC;
+  color: #03543F;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* Filas alternadas lavanda de tablas - Captura 5 */
+.justi-table-row-even {
+  background-color: #E5E5F7;
+}
+
+.justi-table-row-odd {
+  background-color: #F4F4FB;
+}
+
+/* Impresión del Informe CRM: solo se imprime la hoja del informe */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .crm-report-sheet,
+  .crm-report-sheet * {
+    visibility: visible;
+  }
+  .crm-report-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    padding: 0;
+  }
+  .crm-report-sheet {
+    max-height: none;
+    border: none;
+    box-shadow: none;
+  }
+  .crm-report-sheet .overflow-y-auto {
+    overflow: visible;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
