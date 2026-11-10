@@ -156,8 +156,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         <div className="mt-8 w-full max-w-4xl border-t border-slate-300 dark:border-slate-700 pt-3 text-center">
           <p className="text-[11px] font-medium text-[#1B5E91] dark:text-sky-400/80">
-            Copyright © 2013/2026 Justi® - Todos y cada uno de los derechos
-            reservados
+            JustiMobile 2026
           </p>
         </div>
       </div>

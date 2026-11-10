@@ -428,6 +428,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
         </div>
       </div>
+
+      <footer className="mt-8 py-3 text-center text-[10px] font-medium text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 transition-colors">
+        JustiMobile 2026
+      </footer>
     </div>
   );
 };

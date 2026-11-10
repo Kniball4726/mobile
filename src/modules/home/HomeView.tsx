@@ -146,8 +146,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ user, onNavigate }) => {
         </div>
       </div>
 
-      <footer className="py-2 text-center text-[10px] text-slate-700 border-t border-slate-200 bg-white">
-        Copyright © 2013 / 2026 Justi® - Todos los derechos reservados
+      <footer className="py-2 text-center text-[10px] font-medium text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+        JustiMobile 2026
       </footer>
     </div>
   );
