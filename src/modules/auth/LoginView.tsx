@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AuthApi } from '../../services/api.service';
 import { LoginResponse } from '../../types/domain.types';
 import { Sun, Moon, ShieldAlert, Clock } from 'lucide-react';
+import { useBranding } from '../../context/BrandingContext';
 
 interface LoginViewProps {
   onLoginSuccess: (session: LoginResponse) => void;
@@ -19,6 +20,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
+  const { branding } = useBranding();
 
   useEffect(() => {
     if (lockoutSeconds <= 0) return;
@@ -109,19 +111,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div className="w-full bg-[#DCEAF7] dark:bg-slate-800 border-b border-[#C6DDF2] dark:border-slate-700 pt-6 pb-4 px-4 flex flex-col items-center">
         <div className="relative mb-2">
           <img
-            src="/ultratech-carreras-logo.svg"
-            alt="UltraTech Carreras"
+            src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+            alt={branding.companyName || 'Logo'}
             className="h-28 w-28 sm:h-32 sm:w-32 object-contain drop-shadow-md hover:scale-105 transition-transform duration-200"
           />
         </div>
 
         <div className="mt-1 text-center">
           <p className="text-xs sm:text-[14px] tracking-[0.14em] font-extrabold text-slate-800 dark:text-slate-100 uppercase">
-            ULTRATECH CARRERAS
+            {branding.companyName || 'ULTRATECH CARRERAS'}
           </p>
           <div className="w-full h-[1.5px] bg-amber-600/40 dark:bg-amber-400/40 my-0.5" />
           <p className="text-[9px] sm:text-[10px] tracking-[0.16em] font-semibold text-slate-600 dark:text-slate-300 uppercase">
-            ADVANCED TECHNOLOGY IN SPORTS NUTRITION
+            {branding.slogan || 'ADVANCED TECHNOLOGY IN SPORTS NUTRITION'}
           </p>
         </div>
 

@@ -16,6 +16,8 @@ import { MercadoPagoIntegrationCard } from './components/MercadoPagoIntegrationC
 import { AfipIntegrationCard } from './components/AfipIntegrationCard';
 import { ApiKeysTable } from './components/ApiKeysTable';
 import { AuditLogsTable } from './components/AuditLogsTable';
+import { BrandingCustomizerCard } from './components/BrandingCustomizerCard';
+import { CompaniesManagerCard } from './components/CompaniesManagerCard';
 
 interface MasterControlViewProps {
   token: string;
@@ -417,6 +419,12 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       <div className="p-3 sm:p-4 space-y-4 flex-1 max-w-[1440px] w-full mx-auto">
         {error && <div className="justi-alert-error">{error}</div>}
         {success && <div className="justi-alert-success">{success}</div>}
+
+        {/* A. Personalización de Marca y Logotipo en Vivo */}
+        <BrandingCustomizerCard token={token} />
+
+        {/* B. Gestión de Empresas Multi-Tenant */}
+        <CompaniesManagerCard token={token} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* 1. Configuración Global & Kill-Switch */}

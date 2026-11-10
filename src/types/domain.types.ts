@@ -422,3 +422,43 @@ export interface CashOperationRecord {
   branch: string;
   userFullName?: string;
 }
+
+export interface CompanyBranding {
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  primaryColor?: string | null;
+  slogan?: string | null;
+  customSvg?: string | null;
+}
+
+export interface CompanyRecord {
+  _id: string;
+  name: string;
+  legalName: string;
+  cuit: string;
+  cuitFormatted: string;
+  status: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE';
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  branding: CompanyBranding;
+  isDefault: boolean;
+  afipEnabled: boolean;
+  mercadoPagoEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicBrandingInfo {
+  companyId: string;
+  companyName: string;
+  legalName: string;
+  cuit: string;
+  slogan: string;
+  logoUrl: string;
+  bannerUrl: string;
+  primaryColor: string;
+  customSvg: string | null;
+  status: string;
+}
+

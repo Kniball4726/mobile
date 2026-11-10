@@ -21,6 +21,7 @@ import { TesoreriaView } from './modules/treasury/TesoreriaView';
 import { MasterControlView } from './modules/master/MasterControlView';
 import { UsuariosView } from './modules/users/UsuariosView';
 import { ProductosView } from './modules/products/ProductosView';
+import { JustiHelpBot } from './components/help-bot/JustiHelpBot';
 import { useAuthSession } from './hooks/useAuthSession';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useTheme } from './hooks/useTheme';
@@ -431,6 +432,9 @@ export const App: React.FC = () => {
             <MasterControlView token={session.accessToken} />
           )}
       </main>
+
+      {/* Asistente interactivo por roles JustiBot */}
+      <JustiHelpBot user={session.user} onNavigate={handleNavigate} />
     </div>
   );
 };

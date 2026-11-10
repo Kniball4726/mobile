@@ -23,6 +23,7 @@ import {
   Moon,
   LineChart,
 } from 'lucide-react';
+import { useBranding } from '../../context/BrandingContext';
 
 interface NavigationDrawerProps {
   isOpen: boolean;
@@ -47,6 +48,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   onNavigate,
   onLogout,
 }) => {
+  const { branding } = useBranding();
   if (!isOpen) return null;
 
   const isMaster = user.role === 'MASTER';
@@ -76,12 +78,12 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <img
-                  src="/ultratech-carreras-logo.svg"
-                  alt="UltraTech Carreras"
+                  src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+                  alt={branding.companyName || 'Logo'}
                   className="h-8 w-8 object-contain drop-shadow"
                 />
                 <span className="text-lg font-black tracking-tight flex items-center">
-                  UltraTech<span className="text-amber-300 ml-1">Carreras</span>
+                  {branding.companyName || 'UltraTech Carreras'}
                 </span>
               </div>
               <button

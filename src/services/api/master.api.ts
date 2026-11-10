@@ -1,13 +1,24 @@
 import {
   ApiKeyRecord,
   AuditLogRecord,
+  CompanyRecord,
   GlobalSystemSettings,
   MaskedAfipSettings,
   MaskedMercadoPagoSettings,
+  PublicBrandingInfo,
   TestAfipConnectionResult,
   TestMpConnectionResult,
 } from '../../types/domain.types';
 import { request } from './client';
+
+export const PublicApi = {
+  getBranding(companyId?: string): Promise<PublicBrandingInfo> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
+    return request<PublicBrandingInfo>(`/public/branding${query}`, {
+      method: 'GET',
+    });
+  },
+};
 
 export const MasterApi = {
   getSettings(token: string): Promise<GlobalSystemSettings> {
@@ -170,6 +181,88 @@ export const MasterApi = {
     return request<AuditLogRecord[]>(
       '/master/audit-logs?limit=50',
       { method: 'GET' },
+      token,
+    );
+  },
+
+  listCompanies(token: string): Promise<CompanyRecord[]> {
+    return request<CompanyRecord[]>('/master/companies', { method: 'GET' }, token);
+  },
+
+  createCompany(
+    token: string,
+    payload: {
+      name: string;
+      legalName: string;
+      cuit: string;
+      email?: string | null;
+      phone?: string | null;
+      address?: string | null;
+      branding?: {
+        logoUrl?: string;
+        slogan?: string;
+        primaryColor?: string;
+      };
+    },
+  ): Promise<CompanyRecord> {
+    return request<CompanyRecord>(
+      '/master/companies',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  updateCompany(
+    token: string,
+    id: string,
+    payload: Partial<CompanyRecord>,
+  ): Promise<CompanyRecord> {
+    return request<CompanyRecord>(
+      `/master/companies/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  toggleCompanyStatus(token: string, id: string): Promise<CompanyRecord> {
+    return request<CompanyRecord>(
+      `/master/companies/${encodeURIComponent(id)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({}),
+      },
+      token,
+    );
+  },
+
+  updateBranding(
+    token: string,
+    payload: {
+      companyName?: string;
+      legalName?: string;
+      slogan?: string;
+      logoUrl?: string;
+      bannerUrl?: string;
+      primaryColor?: string;
+      customSvg?: string;
+    },
+    companyId?: string,
+  ): Promise<PublicBrandingInfo> {
+    const path = companyId
+      ? `/master/companies/${encodeURIComponent(companyId)}/branding`
+      : '/master/companies/branding';
+    return request<PublicBrandingInfo>(
+      path,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
       token,
     );
   },

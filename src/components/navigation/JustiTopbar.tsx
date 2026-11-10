@@ -18,6 +18,7 @@ import {
   LineChart,
 } from 'lucide-react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
+import { useBranding } from '../../context/BrandingContext';
 import { NavigationDrawer } from './NavigationDrawer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { UserMenuDropdown } from './UserMenuDropdown';
@@ -45,6 +46,7 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   onNavigate,
   onLogout,
 }) => {
+  const { branding } = useBranding();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<
     'VENTAS' | 'TESORERIA' | 'USER' | null
@@ -107,15 +109,15 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 onNavigate('BIENVENIDO');
               }}
               className="flex items-center gap-2 rounded px-1.5 py-0.5 hover:bg-white/10 transition-colors"
-              title="Ir a Inicio - UltraTech Carreras"
+              title={`Ir a Inicio - ${branding.companyName || 'UltraTech Carreras'}`}
             >
               <img
-                src="/ultratech-carreras-logo.svg"
-                alt="UltraTech Carreras"
+                src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+                alt={branding.companyName || 'Logo'}
                 className="h-7 w-7 object-contain drop-shadow-sm"
               />
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center">
-                UltraTech<span className="text-amber-300 ml-1">Carreras</span>
+                {branding.companyName || 'UltraTech Carreras'}
               </span>
             </button>
 
