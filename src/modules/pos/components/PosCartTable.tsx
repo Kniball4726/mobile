@@ -1,6 +1,7 @@
 import React from 'react';
 import { Barcode, Camera, Minus, Plus, Trash2 } from 'lucide-react';
 import { CartItem, ProductItem } from '../../../types/domain.types';
+import { useBranding } from '../../../context/BrandingContext';
 
 interface PosCartTableProps {
   cart: CartItem[];
@@ -49,6 +50,7 @@ export const PosCartTable: React.FC<PosCartTableProps> = ({
   onApplyGeneralDiscount,
   onGeneralDiscountInputChange,
 }) => {
+  const { branding } = useBranding();
   return (
     <div className="border border-[#80AED8] dark:border-slate-700 bg-[#E8ECF8] dark:bg-slate-900 rounded-sm overflow-hidden">
       <div className="justi-section-header dark:bg-slate-800 flex items-center justify-between gap-2">
@@ -141,7 +143,7 @@ export const PosCartTable: React.FC<PosCartTableProps> = ({
         {cart.length === 0 ? (
           <div className="rounded bg-white/80 p-4 text-center text-xs text-slate-500">
             Toque &quot;Usar Cámara&quot; o escriba el nombre/código del
-            suplemento Ultra Tech para agregarlo.
+            artículo para agregarlo.
           </div>
         ) : (
           cart.map((item) => {
@@ -372,7 +374,7 @@ export const PosCartTable: React.FC<PosCartTableProps> = ({
                     </td>
                     <td className="p-1.5">
                       <span className="block rounded bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-slate-700 dark:text-slate-200">
-                        ULTRA TECH
+                        {branding.companyName || 'Marca Propia'}
                       </span>
                     </td>
                     <td className="p-2 font-bold text-slate-900 dark:text-slate-100 text-xs">

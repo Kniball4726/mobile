@@ -36,7 +36,7 @@ export const CompaniesManagerCard: React.FC<CompaniesManagerCardProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [logoUrl, setLogoUrl] = useState('/ultratech-carreras-logo.svg');
+  const [logoUrl, setLogoUrl] = useState('/justi-logo.svg');
 
   const fetchCompanies = useCallback(async () => {
     try {
@@ -87,7 +87,7 @@ export const CompaniesManagerCard: React.FC<CompaniesManagerCardProps> = ({
         phone: phone.trim() || null,
         address: address.trim() || null,
         branding: {
-          logoUrl: logoUrl.trim() || '/ultratech-carreras-logo.svg',
+          logoUrl: logoUrl.trim() || '/justi-logo.svg',
         },
       });
 
@@ -189,7 +189,7 @@ export const CompaniesManagerCard: React.FC<CompaniesManagerCardProps> = ({
                 <div className="flex items-center gap-3">
                   <div className="h-11 w-11 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center p-1 shrink-0 shadow-sm">
                     <img
-                      src={company.branding?.logoUrl || '/ultratech-carreras-logo.svg'}
+                      src={company.branding?.logoUrl || '/justi-logo.svg'}
                       alt={company.name}
                       className="max-h-full max-w-full object-contain"
                     />
@@ -310,7 +310,7 @@ export const CompaniesManagerCard: React.FC<CompaniesManagerCardProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Ej. UltraTech Sucursal Palermo"
+                  placeholder="Ej. Sucursal Centro"
                   className="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
@@ -395,7 +395,7 @@ export const CompaniesManagerCard: React.FC<CompaniesManagerCardProps> = ({
                   type="text"
                   value={logoUrl}
                   onChange={(e) => setLogoUrl(e.target.value)}
-                  placeholder="/ultratech-carreras-logo.svg"
+                  placeholder="/justi-logo.svg o URL web"
                   className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
                 />
               </div>

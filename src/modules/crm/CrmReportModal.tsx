@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { FileText, Printer, FileSpreadsheet, X } from 'lucide-react';
 import { CustomerItem } from '../../types/domain.types';
+import { useBranding } from '../../context/BrandingContext';
 
 interface CrmReportModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
   customers,
   onClose,
 }) => {
+  const { branding } = useBranding();
   const [order, setOrder] = useState<SortOrder>('DESC');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -67,7 +69,7 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
 
   const handleExportCsv = () => {
     const titleLines = [
-      'INFORME DE CLIENTES CRM — ULTRA TECH CARRERAS',
+      `INFORME DE CLIENTES CRM — ${(branding.companyName || 'SISTEMA CRM').toUpperCase()}`,
       `Fecha de Generación: ${new Date().toLocaleString('es-AR')}`,
       '',
     ];
@@ -155,7 +157,7 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 text-xs">
           <div className="mb-3 text-center">
             <h2 className="text-base font-bold text-[#1B5E91]">
-              ULTRA TECH CARRERAS — Informe de Clientes CRM
+              {(branding.companyName || 'SISTEMA CRM').toUpperCase()} — Informe de Clientes CRM
             </h2>
             <p className="text-[11px] text-slate-600">
               Sucursal CARRERAS • Generado: {new Date().toLocaleString('es-AR')} •

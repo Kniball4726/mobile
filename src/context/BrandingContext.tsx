@@ -10,13 +10,13 @@ import { PublicBrandingInfo } from '../types/domain.types';
 
 export const DEFAULT_BRANDING: PublicBrandingInfo = {
   companyId: 'default',
-  companyName: 'UltraTech Carreras',
-  legalName: 'UltraTech Sports Nutrition S.A.',
+  companyName: 'JustiMobile POS',
+  legalName: 'Empresa Matriz S.A.',
   cuit: '30-71234567-9',
-  slogan: 'ADVANCED TECHNOLOGY IN SPORTS NUTRITION',
-  logoUrl: '/ultratech-carreras-logo.svg',
-  bannerUrl: '/ultratech-carreras-banner.svg',
-  primaryColor: '#D4AF37',
+  slogan: 'PLATAFORMA SAAS MULTI-TENANT',
+  logoUrl: '/justi-logo.svg',
+  bannerUrl: '/justi-logo.svg',
+  primaryColor: '#1B5E91',
   customSvg: null,
   status: 'ACTIVE',
 };

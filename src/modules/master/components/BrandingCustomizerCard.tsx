@@ -9,16 +9,16 @@ interface BrandingCustomizerCardProps {
 
 const PRESET_LOGOS = [
   {
-    id: 'ultratech-svg',
-    label: 'UltraTech Carreras — Vector SVG Dorado (Calidad Infinita / Transparente)',
-    url: '/ultratech-carreras-logo.svg',
+    id: 'justi-svg',
+    label: 'JustiMobile POS — Logotipo Oficial (SVG)',
+    url: '/justi-logo.svg',
     type: 'svg',
   },
   {
-    id: 'ultratech-grey',
-    label: 'UltraTech Carreras — Fondo Gris Claro (Sombra Suave)',
-    url: '/ultratech-carreras-logo.png',
-    type: 'png',
+    id: 'gold-svg',
+    label: 'Vector Dorado Alternativo (SVG)',
+    url: '/ultratech-carreras-logo.svg',
+    type: 'svg',
   },
 ];
 
@@ -110,7 +110,7 @@ export const BrandingCustomizerCard: React.FC<BrandingCustomizerCardProps> = ({
               onChange={(e) => setCompanyName(e.target.value)}
               required
               className="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 outline-none"
-              placeholder="Ej. UltraTech Carreras"
+              placeholder="Ej. Mi Empresa POS"
             />
             <p className="text-[11px] text-slate-500 mt-1">
               Se visualiza en el título del navegador, login y barra superior.
@@ -126,7 +126,7 @@ export const BrandingCustomizerCard: React.FC<BrandingCustomizerCardProps> = ({
               value={legalName}
               onChange={(e) => setLegalName(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 outline-none"
-              placeholder="Ej. UltraTech Sports Nutrition S.A."
+              placeholder="Ej. Mi Empresa S.A."
             />
           </div>
         </div>

@@ -2,8 +2,9 @@ import { BranchType, UserRecord, UserRole } from '../../types/domain.types';
 import { request } from './client';
 
 export const UsersApi = {
-  listUsers(token: string): Promise<UserRecord[]> {
-    return request<UserRecord[]>('/users', { method: 'GET' }, token);
+  listUsers(token: string, companyId?: string): Promise<UserRecord[]> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
+    return request<UserRecord[]>(`/users${query}`, { method: 'GET' }, token);
   },
 
   createUser(
@@ -14,6 +15,7 @@ export const UsersApi = {
       password: string;
       role: Exclude<UserRole, 'MASTER'>;
       branch: BranchType;
+      companyId?: string | null;
     },
   ): Promise<UserRecord> {
     return request<UserRecord>(

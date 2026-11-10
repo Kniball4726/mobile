@@ -83,12 +83,12 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <img
-                  src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+                  src={branding.logoUrl || '/justi-logo.svg'}
                   alt={branding.companyName || 'Logo'}
                   className="h-8 w-8 object-contain drop-shadow"
                 />
                 <span className="text-lg font-black tracking-tight flex items-center">
-                  {branding.companyName || 'UltraTech Carreras'}
+                  {branding.companyName || 'JustiMobile POS'}
                 </span>
               </div>
               <button

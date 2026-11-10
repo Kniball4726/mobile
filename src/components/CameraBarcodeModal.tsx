@@ -7,10 +7,10 @@ interface CameraBarcodeModalProps {
   onDetected: (barcode: string) => void;
 }
 
-const SAMPLE_ULTRATECH_BARCODES = [
+const SAMPLE_DEMO_BARCODES = [
   { code: '7798139070010', label: 'Whey Protein 1 Kg (Cód: 103)' },
   { code: '7798139074520', label: 'Tri Protein 1 Kg (Cód: 235)' },
-  { code: '7798139074186', label: 'Pastillero Ultra Tech (Cód: 214)' },
+  { code: '7798139074186', label: 'Pastillero Deportivo (Cód: 214)' },
   { code: '7798139070270', label: 'Creatina Micronizada 300g (Cód: 120)' },
 ];
 
@@ -128,7 +128,7 @@ export const CameraBarcodeModal: React.FC<CameraBarcodeModalProps> = ({
                 <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 shadow-[0_0_8px_#ef4444]" />
               </div>
               <span className="mt-2 rounded bg-black/60 px-2 py-0.5 text-[11px] text-white">
-                Apunta al código EAN-13 del suplemento Ultra Tech
+                Apunta al código EAN-13 del producto
               </span>
             </div>
           </div>
@@ -162,14 +162,14 @@ export const CameraBarcodeModal: React.FC<CameraBarcodeModalProps> = ({
             </button>
           </form>
 
-          {/* Simulador rápido con productos reales de ultratechrun.xlsx */}
+          {/* Simulador rápido con productos de ejemplo */}
           <div className="rounded border border-[#B8D4EC] bg-white p-2.5">
             <div className="mb-1.5 flex items-center gap-1 text-[11px] font-bold text-[#1B5E91]">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>Simular lectura rápida (Catálogo Ultra Tech):</span>
+              <span>Simular lectura rápida (Catálogo Demostrativo):</span>
             </div>
             <div className="grid grid-cols-1 gap-1.5">
-              {SAMPLE_ULTRATECH_BARCODES.map((item) => (
+              {SAMPLE_DEMO_BARCODES.map((item) => (
                 <button
                   key={item.code}
                   type="button"

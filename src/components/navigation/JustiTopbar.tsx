@@ -113,15 +113,15 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 onNavigate('BIENVENIDO');
               }}
               className="flex items-center gap-2 rounded px-1.5 py-0.5 hover:bg-white/10 transition-colors"
-              title={`Ir a Inicio - ${branding.companyName || 'UltraTech Carreras'}`}
+              title={`Ir a Inicio - ${branding.companyName || 'JustiMobile POS'}`}
             >
               <img
-                src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+                src={branding.logoUrl || '/justi-logo.svg'}
                 alt={branding.companyName || 'Logo'}
                 className="h-7 w-7 object-contain drop-shadow-sm"
               />
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center">
-                {branding.companyName || 'UltraTech Carreras'}
+                {branding.companyName || 'JustiMobile POS'}
               </span>
             </button>
 

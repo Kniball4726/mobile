@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useBranding } from '../../context/BrandingContext';
 import {
   ActiveScreen,
   BusinessIntelligenceData,
@@ -41,6 +42,7 @@ export const BiDashboardView: React.FC<BiDashboardViewProps> = ({
   user,
   onNavigate,
 }) => {
+  const { branding } = useBranding();
   const [activeTab, setActiveTab] = useState<'BI' | 'SUPERVISION'>('BI');
   const [timeRange, setTimeRange] = useState<'today' | '7d' | '30d' | 'all'>('7d');
   const [branchFilter, setBranchFilter] = useState<'ALL' | 'LOCALES' | 'CARRERAS'>('ALL');
@@ -105,7 +107,7 @@ export const BiDashboardView: React.FC<BiDashboardViewProps> = ({
   const handleExportCsv = () => {
     if (!biData) return;
     const rows: (string | number)[][] = [
-      ['REPORTE EJECUTIVO DE INTELIGENCIA DE NEGOCIOS - ULTRA TECH CARRERAS'],
+      [`REPORTE EJECUTIVO DE INTELIGENCIA DE NEGOCIOS - ${(branding.companyName || 'SISTEMA POS & CRM').toUpperCase()}`],
       ['Fecha y Hora de Generación', new Date().toLocaleString('es-AR')],
       ['Rango Temporal', biData.timeRange],
       ['Sucursal Filtrada', biData.branch],

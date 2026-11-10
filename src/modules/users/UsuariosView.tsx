@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { UsersApi } from '../../services/api.service';
-import { BranchType, UserRecord, UserRole } from '../../types/domain.types';
-import { Building2, UserPlus, RefreshCw, Lock } from 'lucide-react';
+import { UsersApi, MasterApi } from '../../services/api.service';
+import { BranchType, CompanyRecord, UserRecord, UserRole } from '../../types/domain.types';
+import { Building2, UserPlus, RefreshCw, Lock, Filter } from 'lucide-react';
 import { JustiFooter } from '../../components/JustiFooter';
 
 interface UsuariosViewProps {
@@ -26,11 +26,33 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
   const [branch, setBranch] = useState<BranchType>('LOCALES');
   const [saving, setSaving] = useState(false);
 
+  // Multi-Tenant / Empresas
+  const [companies, setCompanies] = useState<CompanyRecord[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [companyFilter, setCompanyFilter] = useState<string>('');
+
+  const loadCompanies = useCallback(async () => {
+    if (currentUserRole !== 'MASTER') return;
+    try {
+      const list = await MasterApi.listCompanies(token);
+      setCompanies(list || []);
+      const def = list.find((c) => c.isDefault) || list[0];
+      if (def) setSelectedCompanyId(def._id);
+    } catch {}
+  }, [token, currentUserRole]);
+
+  useEffect(() => {
+    loadCompanies();
+  }, [loadCompanies]);
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const list = await UsersApi.listUsers(token);
+      const list = await UsersApi.listUsers(
+        token,
+        currentUserRole === 'MASTER' && companyFilter ? companyFilter : undefined,
+      );
       setUsers(
         currentUserRole === 'MASTER'
           ? list
@@ -45,7 +67,7 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [token, currentUserRole]);
+  }, [token, currentUserRole, companyFilter]);
 
   useEffect(() => {
     loadUsers();
@@ -63,6 +85,7 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
         password,
         role,
         branch,
+        companyId: currentUserRole === 'MASTER' ? selectedCompanyId || null : undefined,
       });
       setSuccess(
         `Operador "${fullName.trim()}" (${role}) creado con sucursal asignada "${branch}".`,
@@ -135,7 +158,9 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
 
           <form
             onSubmit={handleCreateUser}
-            className="p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 items-end text-xs"
+            className={`p-3 grid grid-cols-1 sm:grid-cols-2 ${
+              currentUserRole === 'MASTER' ? 'lg:grid-cols-7' : 'lg:grid-cols-6'
+            } gap-2.5 items-end text-xs`}
           >
             <div>
               <label className="block font-bold text-[#1B5E91] mb-1">
@@ -199,6 +224,29 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
               </select>
             </div>
 
+            {currentUserRole === 'MASTER' && (
+              <div>
+                <label className="block font-bold text-[#1B5E91] mb-1">
+                  Empresa Asignada *:
+                </label>
+                <select
+                  value={selectedCompanyId}
+                  onChange={(e) => setSelectedCompanyId(e.target.value)}
+                  required
+                  className="justi-select w-full font-bold bg-amber-50 border-amber-300 text-amber-900"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  {companies
+                    .filter((c) => c.status === 'ACTIVE')
+                    .map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name} {c.isDefault ? '(Default)' : ''}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
             <div>
               <label className="block font-bold text-[#1B5E91] mb-1">
                 Sucursal Asignada *:
@@ -225,17 +273,40 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
           </form>
         </div>
 
+        {/* Filtro Multi-Empresa para MASTER */}
+        {currentUserRole === 'MASTER' && companies.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-white border border-[#80AED8] rounded text-xs shadow-sm">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-[#1B5E91]" />
+              <span className="font-bold text-slate-800">
+                Filtrar Operadores por Empresa (Tenant):
+              </span>
+            </div>
+            <select
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+              className="justi-select py-1 px-3 text-xs font-bold w-full sm:w-auto text-[#1B5E91]"
+            >
+              <option value="">Todas las Empresas ({companies.length})</option>
+              {companies.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.name} {c.isDefault ? '(Predeterminada)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Tabla de Operadores y Cambio Rápido de Sucursal Asignada */}
         <div className="border border-[#80AED8] bg-white overflow-x-auto">
           <div className="justi-section-header flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Building2 className="h-4 w-4" />
-              Operadores Registrados (Asignación de Sucursal por Admin)
+              Operadores Registrados (Asignación de Sucursal y Empresa)
             </span>
             <span className="text-[11px] font-normal flex items-center gap-1">
               <Lock className="h-3 w-3" />
-              La sucursal elegida aquí queda bloqueada para el Vendedor y el
-              CRM
+              La sucursal elegida aquí queda bloqueada para el Vendedor y el CRM
             </span>
           </div>
 
@@ -244,6 +315,7 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
               <tr className="bg-[#DCEAF7] text-[#1B5E91] border-b border-[#80AED8]">
                 <th className="py-2 px-3">Operador</th>
                 <th className="py-2 px-3">Email</th>
+                <th className="py-2 px-3">Empresa (Tenant)</th>
                 <th className="py-2 px-3">Rol</th>
                 <th className="py-2 px-3">Sucursal Asignada (Enum)</th>
                 <th className="py-2 px-3">Estado</th>
@@ -263,6 +335,12 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
                     {u.fullName}
                   </td>
                   <td className="py-2 px-3 font-mono text-[11px]">{u.email}</td>
+                  <td className="py-2 px-3">
+                    <span className="inline-flex items-center gap-1 rounded bg-amber-50 border border-amber-300 px-2 py-0.5 text-[11px] font-bold text-amber-900">
+                      <Building2 className="h-3 w-3 text-amber-600 shrink-0" />
+                      {u.companyName || 'UltraTech Carreras'}
+                    </span>
+                  </td>
                   <td className="py-2 px-3">
                     <span className="rounded bg-[#DCEAF7] border border-[#9CC2E5] px-2 py-0.5 text-[11px] font-bold text-[#1B5E91]">
                       {u.role}

@@ -8,6 +8,8 @@ export interface UserProfile {
   fullName: string;
   role: UserRole;
   branch?: BranchType;
+  companyId?: string | null;
+  companyName?: string | null;
 }
 
 export interface UserRecord {
@@ -16,6 +18,8 @@ export interface UserRecord {
   fullName: string;
   role: UserRole;
   branch: BranchType;
+  companyId?: string | null;
+  companyName?: string | null;
   isActive: boolean;
   createdAt: string;
 }

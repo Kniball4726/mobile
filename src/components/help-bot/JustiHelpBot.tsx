@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useBranding } from '../../context/BrandingContext';
 import {
   ActiveScreen,
   MasterTab,
@@ -31,6 +32,7 @@ export const JustiHelpBot: React.FC<JustiHelpBotProps> = ({
   user,
   onNavigate,
 }) => {
+  const { branding } = useBranding();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTopic, setSelectedTopic] = useState<HelpTopic | null>(null);
@@ -118,7 +120,7 @@ export const JustiHelpBot: React.FC<JustiHelpBotProps> = ({
                   </span>
                 </div>
                 <p className="text-[10px] text-blue-100 flex items-center gap-1">
-                  <span>Ultra Tech Carreras</span>
+                  <span>{branding.companyName || 'JustiMobile POS'}</span>
                   <span>•</span>
                   <span className="font-semibold text-amber-200">
                     Rol: {user.role}
@@ -320,7 +322,7 @@ export const JustiHelpBot: React.FC<JustiHelpBotProps> = ({
 
           {/* Pie del Asistente */}
           <div className="p-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 text-center text-[10px] text-slate-500 dark:text-slate-400 select-none">
-            JustiBot v2.0 • Ultra Tech Carreras • Soporte 100% Offline
+            JustiBot v2.0 • {branding.companyName || 'SaaS Multi-Tenant'} • Soporte 100% Offline
           </div>
         </div>
       )}

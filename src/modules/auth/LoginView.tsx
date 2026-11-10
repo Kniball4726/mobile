@@ -111,7 +111,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div className="w-full bg-[#DCEAF7] dark:bg-slate-800 border-b border-[#C6DDF2] dark:border-slate-700 pt-6 pb-4 px-4 flex flex-col items-center">
         <div className="relative mb-2">
           <img
-            src={branding.logoUrl || '/ultratech-carreras-logo.svg'}
+            src={branding.logoUrl || '/justi-logo.svg'}
             alt={branding.companyName || 'Logo'}
             className="h-28 w-28 sm:h-32 sm:w-32 object-contain drop-shadow-md hover:scale-105 transition-transform duration-200"
           />
@@ -119,11 +119,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         <div className="mt-1 text-center">
           <p className="text-xs sm:text-[14px] tracking-[0.14em] font-extrabold text-slate-800 dark:text-slate-100 uppercase">
-            {branding.companyName || 'ULTRATECH CARRERAS'}
+            {branding.companyName || 'JUSTIMOBILE POS'}
           </p>
           <div className="w-full h-[1.5px] bg-amber-600/40 dark:bg-amber-400/40 my-0.5" />
           <p className="text-[9px] sm:text-[10px] tracking-[0.16em] font-semibold text-slate-600 dark:text-slate-300 uppercase">
-            {branding.slogan || 'ADVANCED TECHNOLOGY IN SPORTS NUTRITION'}
+            {branding.slogan || 'PLATAFORMA SAAS MULTI-TENANT'}
           </p>
         </div>
 

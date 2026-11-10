@@ -195,11 +195,11 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Fidelización CRM',
     question: '¿Cómo generar y exportar el informe de clientes a Excel o PDF?',
     summary:
-      'Permite auditar el padrón de clientes fidelizados bajo la marca Ultra Tech Carreras.',
+      'Permite auditar el padrón de clientes fidelizados de la empresa.',
     steps: [
       'En la vista "Clientes (CRM)", presione el botón "Informe CRM".',
       'Seleccione los filtros deseados: rango de fechas (Desde / Hasta) y criterio de ordenamiento.',
-      'Presione "Excel (CSV)" para descargar una planilla estructurada con cabecera de Ultra Tech Carreras.',
+      'Presione "Excel (CSV)" para descargar una planilla estructurada con cabecera oficial de la empresa.',
       'O presione "Imprimir / PDF" para abrir la vista imprimible con métricas de clientes activos y promedio de descuentos.',
     ],
     targetScreen: 'CLIENTES',
@@ -265,7 +265,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Catálogo y Precios',
     question: '¿Cómo modificar precios de venta o dar de alta nuevos productos?',
     summary:
-      'El Administrador gestiona el catálogo oficial y la lista de precios de Ultra Tech Carreras.',
+      'El Administrador gestiona el catálogo oficial y la lista de precios de la empresa.',
     steps: [
       'Haga clic en "Productos" en la barra superior o en el botón "Catálogo y Precios" del panel.',
       'Para modificar un precio: busque el artículo por Nombre o SKU, presione el botón azul "Precio", tipee el nuevo valor en pesos ($) y presione "Guardar Precio". El cambio impacta inmediatamente en el POS.',

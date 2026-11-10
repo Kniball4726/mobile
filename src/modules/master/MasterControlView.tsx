@@ -12,15 +12,11 @@ import {
   TestAfipConnectionResult,
 } from '../../types/domain.types';
 import { Building2, Layers, ShieldAlert, FileText } from 'lucide-react';
-
-import { SystemSettingsCard } from './components/SystemSettingsCard';
-import { ApiKeyCreateCard } from './components/ApiKeyCreateCard';
-import { MercadoPagoIntegrationCard } from './components/MercadoPagoIntegrationCard';
-import { AfipIntegrationCard } from './components/AfipIntegrationCard';
-import { ApiKeysTable } from './components/ApiKeysTable';
-import { AuditLogsTable } from './components/AuditLogsTable';
-import { BrandingCustomizerCard } from './components/BrandingCustomizerCard';
-import { CompaniesManagerCard } from './components/CompaniesManagerCard';
+import { CompaniesTab } from './components/CompaniesTab';
+import { IntegrationsTab } from './components/IntegrationsTab';
+import { SecurityTab } from './components/SecurityTab';
+import { AuditTab } from './components/AuditTab';
+import { parseApiError } from '../../utils/error-handler';
 
 interface MasterControlViewProps {
   token: string;
@@ -58,9 +54,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
     'crm:write',
     'catalog:read',
   ]);
-  const [createdPlaintextKey, setCreatedPlaintextKey] = useState<string | null>(
-    null,
-  );
+  const [createdPlaintextKey, setCreatedPlaintextKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   // Formulario Settings
@@ -69,8 +63,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
   const [crmPaused, setCrmPaused] = useState<boolean>(false);
 
   // Formulario Mercado Pago (Exclusivo MASTER)
-  const [mpSettings, setMpSettings] =
-    useState<MaskedMercadoPagoSettings | null>(null);
+  const [mpSettings, setMpSettings] = useState<MaskedMercadoPagoSettings | null>(null);
   const [mpEnabled, setMpEnabled] = useState(false);
   const [mpSandbox, setMpSandbox] = useState(true);
   const [mpPublicKey, setMpPublicKey] = useState('');
@@ -87,8 +80,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
   const [savingMp, setSavingMp] = useState(false);
 
   // Formulario Facturación Electrónica AFIP / ARCA (Exclusivo MASTER)
-  const [afipSettings, setAfipSettings] =
-    useState<MaskedAfipSettings | null>(null);
+  const [afipSettings, setAfipSettings] = useState<MaskedAfipSettings | null>(null);
   const [afipEnabled, setAfipEnabled] = useState(false);
   const [afipProduction, setAfipProduction] = useState(false);
   const [afipCuit, setAfipCuit] = useState('');
@@ -99,8 +91,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
   const [afipDefaultCbteTipo, setAfipDefaultCbteTipo] = useState<number>(6);
   const [showAfipKey, setShowAfipKey] = useState(false);
   const [testingAfip, setTestingAfip] = useState(false);
-  const [afipTestResult, setAfipTestResult] =
-    useState<TestAfipConnectionResult | null>(null);
+  const [afipTestResult, setAfipTestResult] = useState<TestAfipConnectionResult | null>(null);
   const [savingAfip, setSavingAfip] = useState(false);
 
   const applyMpSettings = useCallback(
@@ -214,11 +205,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         applyMpSettings(mpCfg);
         applyAfipSettings(afipCfg, activeCompany?.cuit);
       } catch (err: unknown) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Error al cargar panel de Control Master.',
-        );
+        setError(parseApiError(err, 'Error al cargar panel de Control Master.').message);
       } finally {
         setLoading(false);
       }
@@ -242,11 +229,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       applyMpSettings(mpCfg);
       applyAfipSettings(afipCfg, company?.cuit);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Error al cargar integraciones de la empresa seleccionada.',
-      );
+      setError(parseApiError(err, 'Error al cargar integraciones de la empresa seleccionada.').message);
     } finally {
       setLoading(false);
     }
@@ -272,9 +255,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       setSettings(updated);
       setSuccess('Parámetros del sistema actualizados correctamente.');
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Error al guardar parámetros.',
-      );
+      setError(parseApiError(err, 'Error al guardar parámetros.').message);
     }
   };
 
@@ -295,11 +276,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       );
       await loadMasterData();
     } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Error al ejecutar Kill-Switch.',
-      );
+      setError(parseApiError(err, 'Error al ejecutar Kill-Switch.').message);
     }
   };
 
@@ -321,9 +298,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       setNewKeyName('');
       await loadMasterData();
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Error al generar clave API.',
-      );
+      setError(parseApiError(err, 'Error al generar clave API.').message);
     }
   };
 
@@ -338,9 +313,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       setSuccess('Clave API revocada exitosamente.');
       await loadMasterData();
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Error al revocar clave API.',
-      );
+      setError(parseApiError(err, 'Error al revocar clave API.').message);
     }
   };
 
@@ -377,15 +350,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         'Configuración de Mercado Pago actualizada exitosamente para la empresa seleccionada bajo política Zero-Knowledge.',
       );
     } catch (err: unknown) {
-      const rawMsg =
-        err instanceof Error
-          ? err.message
-          : 'Error al actualizar credenciales de Mercado Pago.';
-      setError(
-        rawMsg.includes('Cannot') || rawMsg.includes('404')
-          ? 'El endpoint de integración de Mercado Pago aún no está desplegado en el servidor actual de Render.'
-          : rawMsg,
-      );
+      setError(parseApiError(err, 'Error al actualizar credenciales de Mercado Pago.').message);
     } finally {
       setSavingMp(false);
     }
@@ -411,12 +376,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       });
       setSuccess(res.message);
     } catch (err: unknown) {
-      const rawMsg =
-        err instanceof Error ? err.message : 'Fallo en la prueba de conexión';
-      const msg =
-        rawMsg.includes('Cannot') || rawMsg.includes('404')
-          ? 'El endpoint de prueba de Mercado Pago aún no está desplegado en el servidor actual de Render.'
-          : rawMsg;
+      const msg = parseApiError(err, 'Fallo en la prueba de conexión con Mercado Pago.').message;
       setMpTestResult({ success: false, message: msg });
       setError(msg);
     } finally {
@@ -462,15 +422,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         'Configuración de Facturación AFIP / ARCA actualizada exitosamente para la empresa seleccionada bajo política Zero-Knowledge.',
       );
     } catch (err: unknown) {
-      const rawMsg =
-        err instanceof Error
-          ? err.message
-          : 'Error al actualizar configuración de AFIP.';
-      setError(
-        rawMsg.includes('Cannot') || rawMsg.includes('404')
-          ? 'El endpoint de integración de AFIP aún no está desplegado en el servidor actual de Render.'
-          : rawMsg,
-      );
+      setError(parseApiError(err, 'Error al actualizar configuración de AFIP.').message);
     } finally {
       setSavingAfip(false);
     }
@@ -497,20 +449,11 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         setError(res.message);
       }
     } catch (err: unknown) {
-      const rawMsg =
-        err instanceof Error
-          ? err.message
-          : 'Fallo en la prueba de conexión con AFIP';
-      const msg =
-        rawMsg.includes('Cannot') || rawMsg.includes('404')
-          ? 'El endpoint de prueba de AFIP aún no está desplegado en el servidor actual de Render.'
-          : rawMsg;
+      const msg = parseApiError(err, 'Fallo en la prueba de conexión con AFIP.').message;
       setAfipTestResult({
         success: false,
         message: msg,
-        environment: afipProduction
-          ? 'Producción'
-          : 'Homologación (Testing)',
+        environment: afipProduction ? 'Producción' : 'Homologación (Testing)',
         cuit: afipCuit.trim() || null,
       });
       setError(msg);
@@ -593,164 +536,95 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         {success && <div className="justi-alert-success">{success}</div>}
 
         {/* 1. PESTAÑA: EMPRESAS & MARCA */}
-        {currentTab === 'EMPRESAS' && (
-          <div className="space-y-4 animate-in fade-in duration-150">
-            {/* A. Personalización de Marca y Logotipo en Vivo */}
-            <BrandingCustomizerCard token={token} />
-
-            {/* B. Gestión de Empresas Multi-Tenant */}
-            <CompaniesManagerCard token={token} />
-          </div>
-        )}
+        {currentTab === 'EMPRESAS' && <CompaniesTab token={token} />}
 
         {/* 2. PESTAÑA: INTEGRACIONES EXTERNAS */}
         {currentTab === 'INTEGRACIONES' && (
-          <div className="space-y-4 animate-in fade-in duration-150">
-            {/* Banner Selector de Empresa para Integraciones */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg p-3.5 border border-[#9CC2E5] dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-[#DCEAF7] dark:bg-slate-700 text-[#1B5E91] dark:text-sky-300">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <span>Pasarelas &amp; Facturación por Empresa</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                      Multi-Tenant Aislado
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Las claves de Mercado Pago y certificados AFIP se asignan independientemente a cada razón social.
-                  </p>
-                </div>
-              </div>
-
-              {companies.length > 0 && (
-                <div className="flex items-center gap-2 shrink-0">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Empresa Jurídica:
-                  </label>
-                  <select
-                    value={selectedCompanyId}
-                    onChange={(e) =>
-                      handleSelectCompanyForIntegrations(e.target.value)
-                    }
-                    className="justi-input text-xs font-bold py-1.5 px-3 min-w-[220px]"
-                  >
-                    {companies.map((c) => (
-                      <option key={c._id} value={c._id}>
-                        {c.name} {c.isDefault ? '★ (Principal)' : ''} [CUIT:{' '}
-                        {c.cuitFormatted || c.cuit}]
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* 3. Integración Mercado Pago */}
-            <MercadoPagoIntegrationCard
-              mpSettings={mpSettings}
-              mpEnabled={mpEnabled}
-              setMpEnabled={setMpEnabled}
-              mpSandbox={mpSandbox}
-              setMpSandbox={setMpSandbox}
-              mpPublicKey={mpPublicKey}
-              setMpPublicKey={setMpPublicKey}
-              mpAccessToken={mpAccessToken}
-              setMpAccessToken={setMpAccessToken}
-              mpWebhookSecret={mpWebhookSecret}
-              setMpWebhookSecret={setMpWebhookSecret}
-              mpPosId={mpPosId}
-              setMpPosId={setMpPosId}
-              showMpToken={showMpToken}
-              setShowMpToken={setShowMpToken}
-              testingMp={testingMp}
-              savingMp={savingMp}
-              mpTestResult={mpTestResult}
-              onTestConnection={handleTestMpConnection}
-              onSave={handleSaveMp}
-            />
-
-            {/* 4. Facturación Electrónica AFIP / ARCA */}
-            <AfipIntegrationCard
-              afipSettings={afipSettings}
-              afipEnabled={afipEnabled}
-              setAfipEnabled={setAfipEnabled}
-              afipProduction={afipProduction}
-              setAfipProduction={setAfipProduction}
-              afipCuit={afipCuit}
-              setAfipCuit={setAfipCuit}
-              afipPuntoVenta={afipPuntoVenta}
-              setAfipPuntoVenta={setAfipPuntoVenta}
-              afipCert={afipCert}
-              setAfipCert={setAfipCert}
-              afipPrivateKey={afipPrivateKey}
-              setAfipPrivateKey={setAfipPrivateKey}
-              afipDefaultConcepto={afipDefaultConcepto}
-              setAfipDefaultConcepto={setAfipDefaultConcepto}
-              afipDefaultCbteTipo={afipDefaultCbteTipo}
-              setAfipDefaultCbteTipo={setAfipDefaultCbteTipo}
-              showAfipKey={showAfipKey}
-              setShowAfipKey={setShowAfipKey}
-              testingAfip={testingAfip}
-              savingAfip={savingAfip}
-              afipTestResult={afipTestResult}
-              onTestConnection={handleTestAfipConnection}
-              onSave={handleSaveAfip}
-            />
-          </div>
+          <IntegrationsTab
+            companies={companies}
+            selectedCompanyId={selectedCompanyId}
+            onSelectCompany={handleSelectCompanyForIntegrations}
+            mpSettings={mpSettings}
+            mpEnabled={mpEnabled}
+            setMpEnabled={setMpEnabled}
+            mpSandbox={mpSandbox}
+            setMpSandbox={setMpSandbox}
+            mpPublicKey={mpPublicKey}
+            setMpPublicKey={setMpPublicKey}
+            mpAccessToken={mpAccessToken}
+            setMpAccessToken={setMpAccessToken}
+            mpWebhookSecret={mpWebhookSecret}
+            setMpWebhookSecret={setMpWebhookSecret}
+            mpPosId={mpPosId}
+            setMpPosId={setMpPosId}
+            showMpToken={showMpToken}
+            setShowMpToken={setShowMpToken}
+            testingMp={testingMp}
+            savingMp={savingMp}
+            mpTestResult={mpTestResult}
+            onTestMpConnection={handleTestMpConnection}
+            onSaveMp={handleSaveMp}
+            afipSettings={afipSettings}
+            afipEnabled={afipEnabled}
+            setAfipEnabled={setAfipEnabled}
+            afipProduction={afipProduction}
+            setAfipProduction={setAfipProduction}
+            afipCuit={afipCuit}
+            setAfipCuit={setAfipCuit}
+            afipPuntoVenta={afipPuntoVenta}
+            setAfipPuntoVenta={setAfipPuntoVenta}
+            afipCert={afipCert}
+            setAfipCert={setAfipCert}
+            afipPrivateKey={afipPrivateKey}
+            setAfipPrivateKey={setAfipPrivateKey}
+            afipDefaultConcepto={afipDefaultConcepto}
+            setAfipDefaultConcepto={setAfipDefaultConcepto}
+            afipDefaultCbteTipo={afipDefaultCbteTipo}
+            setAfipDefaultCbteTipo={setAfipDefaultCbteTipo}
+            showAfipKey={showAfipKey}
+            setShowAfipKey={setShowAfipKey}
+            testingAfip={testingAfip}
+            savingAfip={savingAfip}
+            afipTestResult={afipTestResult}
+            onTestAfipConnection={handleTestAfipConnection}
+            onSaveAfip={handleSaveAfip}
+          />
         )}
 
         {/* 3. PESTAÑA: SEGURIDAD & APIS */}
         {currentTab === 'SEGURIDAD' && (
-          <div className="space-y-4 animate-in fade-in duration-150">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* 1. Configuración Global & Kill-Switch */}
-              <SystemSettingsCard
-                maxDiscountInput={maxDiscountInput}
-                setMaxDiscountInput={setMaxDiscountInput}
-                posPaused={posPaused}
-                setPosPaused={setPosPaused}
-                crmPaused={crmPaused}
-                setCrmPaused={setCrmPaused}
-                loading={loading}
-                onRefresh={loadMasterData}
-                onSave={handleSaveSettings}
-                onKillSwitch={handleKillSwitch}
-              />
-
-              {/* 2. Generador de API Keys Externas */}
-              <ApiKeyCreateCard
-                newKeyName={newKeyName}
-                setNewKeyName={setNewKeyName}
-                selectedScopes={selectedScopes}
-                toggleScope={toggleScope}
-                createdPlaintextKey={createdPlaintextKey}
-                copied={copied}
-                onCopyKey={() => {
-                  if (createdPlaintextKey) {
-                    navigator.clipboard.writeText(createdPlaintextKey);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }
-                }}
-                onSubmit={handleCreateKey}
-              />
-            </div>
-
-            {/* 5. Tabla de API Keys Registradas */}
-            <ApiKeysTable apiKeys={apiKeys} onRevokeKey={handleRevokeKey} />
-          </div>
+          <SecurityTab
+            maxDiscountInput={maxDiscountInput}
+            setMaxDiscountInput={setMaxDiscountInput}
+            posPaused={posPaused}
+            setPosPaused={setPosPaused}
+            crmPaused={crmPaused}
+            setCrmPaused={setCrmPaused}
+            loading={loading}
+            onRefresh={loadMasterData}
+            onSaveSettings={handleSaveSettings}
+            onKillSwitch={handleKillSwitch}
+            newKeyName={newKeyName}
+            setNewKeyName={setNewKeyName}
+            selectedScopes={selectedScopes}
+            toggleScope={toggleScope}
+            createdPlaintextKey={createdPlaintextKey}
+            copied={copied}
+            onCopyKey={() => {
+              if (createdPlaintextKey) {
+                navigator.clipboard.writeText(createdPlaintextKey);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }
+            }}
+            onCreateKey={handleCreateKey}
+            apiKeys={apiKeys}
+            onRevokeKey={handleRevokeKey}
+          />
         )}
 
         {/* 4. PESTAÑA: AUDITORÍA GLOBAL */}
-        {currentTab === 'AUDITORIA' && (
-          <div className="space-y-4 animate-in fade-in duration-150">
-            {/* 6. Bitácora de Auditoría Inmutable */}
-            <AuditLogsTable auditLogs={auditLogs} />
-          </div>
-        )}
+        {currentTab === 'AUDITORIA' && <AuditTab auditLogs={auditLogs} />}
 
         <JustiFooter className="mt-8" />
       </div>
