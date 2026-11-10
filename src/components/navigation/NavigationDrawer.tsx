@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActiveScreen,
+  MasterTab,
   TesoreriaTab,
   UserProfile,
 } from '../../types/domain.types';
@@ -22,6 +23,7 @@ import {
   Sun,
   Moon,
   LineChart,
+  Layers,
 } from 'lucide-react';
 import { useBranding } from '../../context/BrandingContext';
 
@@ -33,7 +35,7 @@ interface NavigationDrawerProps {
   isDark?: boolean;
   onToggleDarkMode?: () => void;
   onClose: () => void;
-  onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab) => void;
+  onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab | MasterTab) => void;
   onLogout: () => void;
 }
 
@@ -57,7 +59,10 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   const canOperateCash = user.role === 'CASHIER';
   const isAdmin = user.role === 'ADMIN';
 
-  const handleNavigate = (screen: ActiveScreen, tab?: TesoreriaTab) => {
+  const handleNavigate = (
+    screen: ActiveScreen,
+    tab?: TesoreriaTab | MasterTab,
+  ) => {
     onClose();
     onNavigate(screen, tab);
   };
@@ -169,23 +174,56 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                   </div>
                 </div>
 
-                {/* Módulo Control Master */}
+                {/* Módulo Control Master Dividido por Funciones */}
                 <div>
                   <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                    Control del Sistema
+                    Control del Sistema (Master)
                   </span>
                   <div className="mt-1 space-y-0.5">
                     <button
                       type="button"
-                      onClick={() => handleNavigate('MASTER_CONTROL')}
+                      onClick={() => handleNavigate('MASTER_CONTROL', 'EMPRESAS')}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
                         activeScreen === 'MASTER_CONTROL'
                           ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
-                      <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
-                      <span>Control Master (Kill-Switch / API)</span>
+                      <Building2 className="h-4 w-4 text-blue-600 dark:text-sky-400" />
+                      <span>Empresas &amp; Marca</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleNavigate('MASTER_CONTROL', 'INTEGRACIONES')
+                      }
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    >
+                      <Layers className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Integraciones (MP / AFIP)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleNavigate('MASTER_CONTROL', 'SEGURIDAD')
+                      }
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    >
+                      <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <span>Seguridad &amp; Kill-Switch</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleNavigate('MASTER_CONTROL', 'AUDITORIA')
+                      }
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    >
+                      <FileText className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                      <span>Bitácora de Auditoría</span>
                     </button>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   ActiveScreen,
+  MasterTab,
   TesoreriaTab,
   UserProfile,
 } from '../../types/domain.types';
@@ -23,7 +24,7 @@ import {
 
 interface JustiHelpBotProps {
   user: UserProfile;
-  onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab) => void;
+  onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab | MasterTab) => void;
 }
 
 export const JustiHelpBot: React.FC<JustiHelpBotProps> = ({

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ActiveScreen,
+  MasterTab,
   TesoreriaTab,
   UserProfile,
 } from '../../types/domain.types';
@@ -16,6 +17,9 @@ import {
   Sun,
   Moon,
   LineChart,
+  Building2,
+  Layers,
+  FileText,
 } from 'lucide-react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useBranding } from '../../context/BrandingContext';
@@ -31,7 +35,7 @@ export interface JustiTopbarProps {
   isCajaOpen: boolean;
   isDark?: boolean;
   onToggleDarkMode?: () => void;
-  onNavigate: (screen: ActiveScreen, tesoreriaTab?: TesoreriaTab) => void;
+  onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab | MasterTab) => void;
   onLogout: () => void;
 }
 
@@ -49,7 +53,7 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   const { branding } = useBranding();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<
-    'VENTAS' | 'TESORERIA' | 'USER' | null
+    'VENTAS' | 'TESORERIA' | 'MASTER' | 'USER' | null
   >(null);
   const { isOnline, pendingCount, isSyncing, syncNow } = useNetworkStatus();
   const navRef = useRef<HTMLDivElement | null>(null);
@@ -152,21 +156,79 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                     <span>Gestión de Usuarios</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenMenu(null);
-                      onNavigate('MASTER_CONTROL');
-                    }}
-                    className={`justi-nav-pill text-xs px-2.5 ${
-                      activeScreen === 'MASTER_CONTROL'
-                        ? 'justi-nav-pill-active'
-                        : ''
-                    }`}
-                  >
-                    <ShieldAlert className="mr-1 h-3.5 w-3.5 text-amber-300" />
-                    <span>Control Master</span>
-                  </button>
+                  {/* Desplegable Control Master por Funciones */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMenu(openMenu === 'MASTER' ? null : 'MASTER')
+                      }
+                      className={`justi-nav-pill text-xs px-2.5 ${
+                        openMenu === 'MASTER' ||
+                        activeScreen === 'MASTER_CONTROL'
+                          ? 'justi-nav-pill-active'
+                          : ''
+                      }`}
+                    >
+                      <ShieldAlert className="mr-1 h-3.5 w-3.5 text-amber-300" />
+                      <span>Control Master</span>
+                      <ChevronDown className="ml-1 h-3.5 w-3.5" />
+                    </button>
+
+                    {openMenu === 'MASTER' && (
+                      <div className="absolute left-0 mt-1 w-60 rounded border border-[#9CC2E5] dark:border-slate-700 bg-[#F5FAFF] dark:bg-slate-800 py-1 shadow-xl z-50">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            onNavigate('MASTER_CONTROL', 'EMPRESAS');
+                          }}
+                          className="flex items-center gap-2 w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-[#D9ECFB] dark:hover:bg-slate-700 hover:text-[#1B5E91] dark:hover:text-blue-300"
+                        >
+                          <Building2 className="h-3.5 w-3.5 text-blue-500" />
+                          <span>Empresas &amp; Marca</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            onNavigate('MASTER_CONTROL', 'INTEGRACIONES');
+                          }}
+                          className="flex items-center gap-2 w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-[#D9ECFB] dark:hover:bg-slate-700 hover:text-[#1B5E91] dark:hover:text-blue-300"
+                        >
+                          <Layers className="h-3.5 w-3.5 text-emerald-500" />
+                          <span>Integraciones (MP / AFIP)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            onNavigate('MASTER_CONTROL', 'SEGURIDAD');
+                          }}
+                          className="flex items-center gap-2 w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-[#D9ECFB] dark:hover:bg-slate-700 hover:text-[#1B5E91] dark:hover:text-blue-300"
+                        >
+                          <ShieldAlert className="h-3.5 w-3.5 text-amber-500" />
+                          <span>Seguridad &amp; APIs</span>
+                        </button>
+
+                        <div className="my-0.5 border-t border-slate-300 dark:border-slate-700 mx-2" />
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            onNavigate('MASTER_CONTROL', 'AUDITORIA');
+                          }}
+                          className="flex items-center gap-2 w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-[#D9ECFB] dark:hover:bg-slate-700 hover:text-[#1B5E91] dark:hover:text-blue-300"
+                        >
+                          <FileText className="h-3.5 w-3.5 text-indigo-500" />
+                          <span>Bitácora de Auditoría</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </>
               ) : isCrmOnly ? (
                 <button

@@ -348,6 +348,12 @@ export type TesoreriaTab =
   | 'OPERACION_CAJA'
   | 'NUEVO_GASTO';
 
+export type MasterTab =
+  | 'EMPRESAS'
+  | 'INTEGRACIONES'
+  | 'SEGURIDAD'
+  | 'AUDITORIA';
+
 export interface ClosureSummary {
   registerId: string;
   userFullName: string;

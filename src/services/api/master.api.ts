@@ -43,9 +43,13 @@ export const MasterApi = {
     );
   },
 
-  getMercadoPagoSettings(token: string): Promise<MaskedMercadoPagoSettings> {
+  getMercadoPagoSettings(
+    token: string,
+    companyId?: string,
+  ): Promise<MaskedMercadoPagoSettings> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<MaskedMercadoPagoSettings>(
-      '/master/integrations/mercadopago',
+      `/master/integrations/mercadopago${query}`,
       { method: 'GET' },
       token,
     );
@@ -62,9 +66,11 @@ export const MasterApi = {
       posId?: string | null;
       userId?: string | null;
     },
+    companyId?: string,
   ): Promise<MaskedMercadoPagoSettings> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<MaskedMercadoPagoSettings>(
-      '/master/integrations/mercadopago',
+      `/master/integrations/mercadopago${query}`,
       {
         method: 'PATCH',
         body: JSON.stringify(payload),
@@ -76,9 +82,11 @@ export const MasterApi = {
   testMercadoPagoConnection(
     token: string,
     accessTokenOverride?: string,
+    companyId?: string,
   ): Promise<TestMpConnectionResult> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<TestMpConnectionResult>(
-      '/master/integrations/mercadopago/test-connection',
+      `/master/integrations/mercadopago/test-connection${query}`,
       {
         method: 'POST',
         body: JSON.stringify({ accessToken: accessTokenOverride }),
@@ -87,9 +95,10 @@ export const MasterApi = {
     );
   },
 
-  getAfipSettings(token: string): Promise<MaskedAfipSettings> {
+  getAfipSettings(token: string, companyId?: string): Promise<MaskedAfipSettings> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<MaskedAfipSettings>(
-      '/master/integrations/afip',
+      `/master/integrations/afip${query}`,
       { method: 'GET' },
       token,
     );
@@ -107,9 +116,11 @@ export const MasterApi = {
       defaultConcepto?: number;
       defaultCbteTipo?: number;
     },
+    companyId?: string,
   ): Promise<MaskedAfipSettings> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<MaskedAfipSettings>(
-      '/master/integrations/afip',
+      `/master/integrations/afip${query}`,
       {
         method: 'PATCH',
         body: JSON.stringify(payload),
@@ -124,12 +135,14 @@ export const MasterApi = {
       cuitOverride?: string;
       isProductionOverride?: boolean;
     },
+    companyId?: string,
   ): Promise<TestAfipConnectionResult> {
+    const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     return request<TestAfipConnectionResult>(
-      '/master/integrations/afip/test-connection',
+      `/master/integrations/afip/test-connection${query}`,
       {
         method: 'POST',
-        body: JSON.stringify(options || {}),
+        body: options ? JSON.stringify(options) : undefined,
       },
       token,
     );

@@ -6,6 +6,7 @@ import {
   CategoryItem,
   CustomerItem,
   LoginResponse,
+  MasterTab,
   ProductItem,
   TesoreriaTab,
 } from './types/domain.types';
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
   const { isOnline, pendingCount, syncNow } = useNetworkStatus();
 
   const [tesoreriaTab, setTesoreriaTab] = useState<TesoreriaTab>('CAJAS');
+  const [masterTab, setMasterTab] = useState<MasterTab>('EMPRESAS');
   const [consumidorFinalMode, setConsumidorFinalMode] =
     useState<boolean>(false);
   const [selectedCustomerForSale, setSelectedCustomerForSale] =
@@ -144,7 +146,7 @@ export const App: React.FC = () => {
 
   const handleNavigate = (
     screen: ActiveScreen,
-    tab?: TesoreriaTab,
+    tab?: TesoreriaTab | MasterTab,
     consumidorFinal?: boolean,
   ) => {
     if (
@@ -160,7 +162,16 @@ export const App: React.FC = () => {
     }
     setActiveScreen(screen);
     if (tab) {
-      setTesoreriaTab(tab);
+      if (
+        tab === 'EMPRESAS' ||
+        tab === 'INTEGRACIONES' ||
+        tab === 'SEGURIDAD' ||
+        tab === 'AUDITORIA'
+      ) {
+        setMasterTab(tab);
+      } else {
+        setTesoreriaTab(tab as TesoreriaTab);
+      }
     }
     if (typeof consumidorFinal === 'boolean') {
       setConsumidorFinalMode(consumidorFinal);
@@ -429,7 +440,11 @@ export const App: React.FC = () => {
 
         {activeScreen === 'MASTER_CONTROL' &&
           session.user.role === 'MASTER' && (
-            <MasterControlView token={session.accessToken} />
+            <MasterControlView
+              token={session.accessToken}
+              activeTab={masterTab}
+              onChangeTab={setMasterTab}
+            />
           )}
       </main>
 

@@ -1,4 +1,9 @@
-import { ActiveScreen, TesoreriaTab, UserRole } from '../../types/domain.types';
+import {
+  ActiveScreen,
+  MasterTab,
+  TesoreriaTab,
+  UserRole,
+} from '../../types/domain.types';
 
 export interface HelpTopic {
   id: string;
@@ -9,7 +14,7 @@ export interface HelpTopic {
   steps: string[];
   tips?: string[];
   targetScreen?: ActiveScreen;
-  targetTab?: TesoreriaTab;
+  targetTab?: TesoreriaTab | MasterTab;
   actionButtonText?: string;
 }
 
@@ -307,6 +312,23 @@ export const HELP_TOPICS: HelpTopic[] = [
   // ROL: MASTER (SUPERADMINISTRADOR)
   // ==========================================
   {
+    id: 'master-companies',
+    roles: ['MASTER'],
+    category: 'Multi-Tenant & Marca',
+    question: '¿Cómo dar de alta empresas y personalizar el logotipo en vivo?',
+    summary:
+      'El rol Master puede crear y administrar empresas con su CUIT, razón social y logotipo independiente.',
+    steps: [
+      'Diríjase a "Control Master" ➔ pestaña "Empresas & Marca".',
+      'En la tarjeta "Gestión de Empresas", presione "Nueva Empresa".',
+      'Complete la Razón Social, CUIT, Email de contacto y enlace al logotipo SVG/PNG.',
+      'En la sección superior "Personalización de Marca", puede cambiar el logotipo y el nombre visible en tiempo real.',
+    ],
+    targetScreen: 'MASTER_CONTROL',
+    targetTab: 'EMPRESAS',
+    actionButtonText: 'Ir a Empresas & Marca',
+  },
+  {
     id: 'master-killswitch',
     roles: ['MASTER'],
     category: 'Seguridad y Contingencia',
@@ -314,14 +336,15 @@ export const HELP_TOPICS: HelpTopic[] = [
     summary:
       'Permite congelar módulos del sistema en menos de 50 milisegundos ante auditorías o contingencias.',
     steps: [
-      'Haga clic en "Control Master" en la barra superior.',
-      'En la sección "Modo Mantenimiento / Kill-Switch", active el interruptor "Pausar Módulo POS" o "Pausar Módulo CRM".',
+      'Haga clic en "Control Master" ➔ pestaña "Seguridad & APIs".',
+      'En la tarjeta "Configuración Global & Kill-Switch", active el interruptor "Pausar Módulo POS" o "Pausar Módulo CRM".',
       'Escriba el motivo visible para los operadores (ej. "Cierre de inventario fiscal").',
       'Los cajeros que intenten crear ventas recibirán un bloqueo automático.',
       'Para restablecer el servicio normal, simplemente desactive los interruptores.',
     ],
     targetScreen: 'MASTER_CONTROL',
-    actionButtonText: 'Ir a Control Master',
+    targetTab: 'SEGURIDAD',
+    actionButtonText: 'Ir a Seguridad & APIs',
   },
   {
     id: 'master-mercadopago',
@@ -331,7 +354,8 @@ export const HELP_TOPICS: HelpTopic[] = [
     summary:
       'La administración de claves secretas de pasarelas de pago es potestad 100% exclusiva del usuario MASTER.',
     steps: [
-      'En "Control Master", localice la tarjeta "Pasarela Mercado Pago (QR Dinámico & APIs de Cobro)".',
+      'En "Control Master" ➔ pestaña "Integraciones (MP / AFIP)".',
+      'Localice la tarjeta "Pasarela Mercado Pago (QR Dinámico & APIs de Cobro)".',
       'Active el interruptor general y seleccione "Modo Sandbox (Pruebas)" o "Modo Producción".',
       'Pegue el Access Token (APP_USR-... o TEST-...) y la Public Key.',
       'Presione el botón "Probar Conexión con Mercado Pago" para validar las claves en vivo contra api.mercadopago.com/users/me.',
@@ -339,7 +363,8 @@ export const HELP_TOPICS: HelpTopic[] = [
       'Presione "Guardar Configuración". Los tokens se persisten bajo enmascaramiento Zero-Knowledge (APP_USR-****-****-****-a1b2).',
     ],
     targetScreen: 'MASTER_CONTROL',
-    actionButtonText: 'Ir a Pasarela Mercado Pago',
+    targetTab: 'INTEGRACIONES',
+    actionButtonText: 'Ir a Integraciones MP / AFIP',
   },
   {
     id: 'master-api-keys',
@@ -349,13 +374,14 @@ export const HELP_TOPICS: HelpTopic[] = [
     summary:
       'Permite conectar sistemas de e-commerce, ERP o terminales remotas mediante autenticación por cabecera x-api-key.',
     steps: [
-      'En "Control Master" ➔ sección "API Keys".',
-      'Presione "Generar Nueva API Key".',
-      'Asigne un nombre identificador y seleccione los scopes permitidos (pos:read, pos:write, crm:read).',
+      'En "Control Master" ➔ pestaña "Seguridad & APIs".',
+      'En la tarjeta "Generador de API Keys Externas", presione "Crear API Key".',
+      'Asigne un nombre identificador y seleccione los scopes permitidos (crm:write, catalog:read, etc.).',
       'Copie la llave privada generada en ese instante, ya que por seguridad criptográfica nunca vuelve a mostrarse completa.',
-      'Para dar de baja una integración, presione el botón "Revocar".',
+      'Para dar de baja una integración, localice la llave en la tabla y presione "Revocar".',
     ],
     targetScreen: 'MASTER_CONTROL',
-    actionButtonText: 'Ir a Control Master',
+    targetTab: 'SEGURIDAD',
+    actionButtonText: 'Ir a Seguridad & APIs',
   },
 ];
