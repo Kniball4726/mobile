@@ -832,6 +832,17 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         onClose={() => setIsCameraOpen(false)}
         onDetected={handleBarcodeOrSkuLookup}
       />
+
+      <MercadoPagoQrModal
+        isOpen={isMpModalOpen}
+        onClose={() => setIsMpModalOpen(false)}
+        token={token}
+        totalPesos={totals.finalTotalPesos}
+        onPaymentApproved={(details) => {
+          setIsMpModalOpen(false);
+          handleCheckout(details.reference);
+        }}
+      />
     </div>
   );
 };
