@@ -109,9 +109,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div className="w-full bg-[#DCEAF7] dark:bg-slate-800 border-b border-[#C6DDF2] dark:border-slate-700 pt-6 pb-4 px-4 flex flex-col items-center">
         <div className="relative mb-2">
           <img
-            src="/ultratech-carreras-logo.png"
+            src={isDark ? '/ultratech-carreras-logo.png' : '/ultratech-carreras-logo-dark.png'}
             alt="UltraTech Carreras"
-            className="h-24 w-24 sm:h-28 sm:w-28 object-contain drop-shadow-lg"
+            className="h-24 w-24 sm:h-28 sm:w-28 object-contain drop-shadow-md transition-all duration-200"
           />
         </div>
 
