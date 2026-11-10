@@ -66,6 +66,11 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
   if (!isOpen) return null;
 
   const handleExportCsv = () => {
+    const titleLines = [
+      'INFORME DE CLIENTES CRM — ULTRA TECH CARRERAS',
+      `Fecha de Generación: ${new Date().toLocaleString('es-AR')}`,
+      '',
+    ];
     const headers = [
       'Nro',
       'Fecha_Hora_Carga',
@@ -90,13 +95,16 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
           : '',
       ].join(';'),
     );
-    const blob = new Blob(['\uFEFF' + [headers.join(';'), ...lines].join('\n')], {
-      type: 'text/csv;charset=utf-8',
-    });
+    const blob = new Blob(
+      ['\uFEFF' + [...titleLines, headers.join(';'), ...lines].join('\n')],
+      {
+        type: 'text/csv;charset=utf-8',
+      },
+    );
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `informe_clientes_crm_${new Date()
+    link.download = `informe_clientes_ultra_tech_${new Date()
       .toISOString()
       .slice(0, 10)}.csv`;
     link.click();
@@ -147,10 +155,10 @@ export const CrmReportModal: React.FC<CrmReportModalProps> = ({
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 text-xs">
           <div className="mb-3 text-center">
             <h2 className="text-base font-bold text-[#1B5E91]">
-              LABORATORIO WEB SUPPLEMENTS — Informe de Clientes CRM
+              ULTRA TECH CARRERAS — Informe de Clientes CRM
             </h2>
             <p className="text-[11px] text-slate-600">
-              Sucursal PASTEUR • Generado: {new Date().toLocaleString('es-AR')} •
+              Sucursal CARRERAS • Generado: {new Date().toLocaleString('es-AR')} •
               Orden: {order === 'DESC' ? 'más recientes primero' : 'más antiguos primero'}
               {(fromDate || toDate) && ` • Rango: ${fromDate || '…'} a ${toDate || '…'}`}
             </p>

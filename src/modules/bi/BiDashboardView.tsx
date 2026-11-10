@@ -105,7 +105,7 @@ export const BiDashboardView: React.FC<BiDashboardViewProps> = ({
   const handleExportCsv = () => {
     if (!biData) return;
     const rows: (string | number)[][] = [
-      ['REPORTE EJECUTIVO DE INTELIGENCIA DE NEGOCIOS - JUSTIMOBILE POS'],
+      ['REPORTE EJECUTIVO DE INTELIGENCIA DE NEGOCIOS - ULTRA TECH CARRERAS'],
       ['Fecha y Hora de Generación', new Date().toLocaleString('es-AR')],
       ['Rango Temporal', biData.timeRange],
       ['Sucursal Filtrada', biData.branch],

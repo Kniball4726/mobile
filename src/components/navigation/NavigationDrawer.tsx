@@ -78,7 +78,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 <img
                   src="/ultratech-carreras-logo.png"
                   alt="UltraTech Carreras"
-                  className="h-8 w-8 object-contain drop-shadow"
+                  className="h-8 w-8 rounded-md object-cover shadow border border-slate-300/30"
                 />
                 <span className="text-lg font-black tracking-tight flex items-center">
                   UltraTech<span className="text-amber-300 ml-1">Carreras</span>
