@@ -302,7 +302,9 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
           <div className="justi-section-header flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Building2 className="h-4 w-4" />
-              Operadores Registrados (Asignación de Sucursal y Empresa)
+              {currentUserRole === 'MASTER'
+                ? 'Operadores Registrados (Asignación de Sucursal y Empresa)'
+                : 'Operadores Registrados (Asignación de Sucursal)'}
             </span>
             <span className="text-[11px] font-normal flex items-center gap-1">
               <Lock className="h-3 w-3" />
@@ -315,7 +317,9 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
               <tr className="bg-[#DCEAF7] text-[#1B5E91] border-b border-[#80AED8]">
                 <th className="py-2 px-3">Operador</th>
                 <th className="py-2 px-3">Email</th>
-                <th className="py-2 px-3">Empresa (Tenant)</th>
+                {currentUserRole === 'MASTER' && (
+                  <th className="py-2 px-3">Empresa (Tenant)</th>
+                )}
                 <th className="py-2 px-3">Rol</th>
                 <th className="py-2 px-3">Sucursal Asignada (Enum)</th>
                 <th className="py-2 px-3">Estado</th>
@@ -335,12 +339,14 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
                     {u.fullName}
                   </td>
                   <td className="py-2 px-3 font-mono text-[11px]">{u.email}</td>
-                  <td className="py-2 px-3">
-                    <span className="inline-flex items-center gap-1 rounded bg-amber-50 border border-amber-300 px-2 py-0.5 text-[11px] font-bold text-amber-900">
-                      <Building2 className="h-3 w-3 text-amber-600 shrink-0" />
-                      {u.companyName || 'UltraTech Carreras'}
-                    </span>
-                  </td>
+                  {currentUserRole === 'MASTER' && (
+                    <td className="py-2 px-3">
+                      <span className="inline-flex items-center gap-1 rounded bg-amber-50 border border-amber-300 px-2 py-0.5 text-[11px] font-bold text-amber-900">
+                        <Building2 className="h-3 w-3 text-amber-600 shrink-0" />
+                        {u.companyName || 'UltraTech Carreras'}
+                      </span>
+                    </td>
+                  )}
                   <td className="py-2 px-3">
                     <span className="rounded bg-[#DCEAF7] border border-[#9CC2E5] px-2 py-0.5 text-[11px] font-bold text-[#1B5E91]">
                       {u.role}

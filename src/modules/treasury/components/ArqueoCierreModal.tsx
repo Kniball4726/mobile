@@ -35,10 +35,10 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-2xl border border-slate-300 max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75 p-3 sm:p-4 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl border border-slate-300 dark:border-slate-700 max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto transition-colors">
         {/* Cabecera */}
-        <div className="bg-[#1B5E91] text-white px-4 py-3 flex items-center justify-between">
+        <div className="bg-[#1B5E91] dark:bg-slate-800 text-white px-4 py-3 flex items-center justify-between border-b border-transparent dark:border-slate-700">
           <div className="flex items-center gap-2">
             <span className="text-base sm:text-lg font-bold">
               {isReadOnlyView ? 'Resumen de Cierre de Caja (Arqueo)' : 'Arqueo y Cierre de Caja'}
@@ -46,8 +46,8 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
             <span
               className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                 selectedRegister?.status === 'ABIERTA'
-                  ? 'bg-emerald-400 text-slate-900'
-                  : 'bg-slate-200 text-slate-800'
+                  ? 'bg-emerald-400 dark:bg-emerald-500/20 text-slate-900 dark:text-emerald-300 dark:border dark:border-emerald-500/40'
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
               }`}
             >
               {selectedRegister?.status}
@@ -56,43 +56,43 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-white hover:text-slate-200 text-lg font-bold px-2 py-0.5 rounded"
+            className="text-white hover:text-slate-200 dark:text-slate-300 dark:hover:text-white text-lg font-bold px-2 py-0.5 rounded transition-colors"
           >
             ✕
           </button>
         </div>
 
         {/* Info de la caja */}
-        <div className="bg-[#DCEAF7] border-b border-[#9CC2E5] px-4 py-2.5 text-xs text-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="bg-[#DCEAF7] dark:bg-slate-800/90 border-b border-[#9CC2E5] dark:border-slate-700 px-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div>
-            <span className="block text-slate-500 text-[10px]">Operador</span>
-            <span className="font-bold text-[#1B5E91]">{selectedRegister?.userFullName}</span>
+            <span className="block text-slate-500 dark:text-slate-400 text-[10px]">Operador</span>
+            <span className="font-bold text-[#1B5E91] dark:text-sky-300">{selectedRegister?.userFullName}</span>
           </div>
           <div>
-            <span className="block text-slate-500 text-[10px]">Tipo de Caja</span>
-            <span className="font-bold">{selectedRegister?.boxType}</span>
+            <span className="block text-slate-500 dark:text-slate-400 text-[10px]">Tipo de Caja</span>
+            <span className="font-bold text-slate-800 dark:text-slate-100">{selectedRegister?.boxType}</span>
           </div>
           <div>
-            <span className="block text-slate-500 text-[10px]">Sucursal</span>
-            <span className="font-bold">{selectedRegister?.branch}</span>
+            <span className="block text-slate-500 dark:text-slate-400 text-[10px]">Sucursal</span>
+            <span className="font-bold text-slate-800 dark:text-slate-100">{selectedRegister?.branch}</span>
           </div>
           <div>
-            <span className="block text-slate-500 text-[10px]">Apertura</span>
-            <span className="font-semibold text-slate-700">{selectedRegister?.openedAt}</span>
+            <span className="block text-slate-500 dark:text-slate-400 text-[10px]">Apertura</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">{selectedRegister?.openedAt}</span>
           </div>
         </div>
 
         {/* Cuerpo del modal con scroll */}
-        <div className="p-4 overflow-y-auto space-y-4 text-xs text-slate-800 flex-1">
+        <div className="p-4 overflow-y-auto space-y-4 text-xs text-slate-800 dark:text-slate-200 flex-1 bg-white dark:bg-slate-900">
           {loadingSummary && (
-            <div className="py-12 text-center text-slate-500">
-              <div className="animate-spin inline-block w-6 h-6 border-2 border-[#1B5E91] border-t-transparent rounded-full mb-2"></div>
+            <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+              <div className="animate-spin inline-block w-6 h-6 border-2 border-[#1B5E91] dark:border-sky-400 border-t-transparent rounded-full mb-2"></div>
               <p className="font-semibold">Calculando arqueo y totales por forma de pago...</p>
             </div>
           )}
 
           {summaryError && (
-            <div className="p-3 bg-red-100 text-red-800 rounded border border-red-300">
+            <div className="p-3 bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-200 rounded border border-red-300 dark:border-red-800">
               {summaryError}
             </div>
           )}
@@ -100,119 +100,119 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
           {!loadingSummary && currentSummary && (
             <>
               {/* SECCIÓN 1: Desglose de Ventas por Forma de Pago */}
-              <div className="border border-[#80AED8] rounded bg-white overflow-hidden shadow-sm">
-                <div className="bg-[#4E8EC2] text-white px-3 py-1.5 flex items-center justify-between font-bold text-xs">
+              <div className="border border-[#80AED8] dark:border-slate-700 rounded bg-white dark:bg-slate-850 overflow-hidden shadow-sm">
+                <div className="bg-[#4E8EC2] dark:bg-slate-800 text-white px-3 py-1.5 flex items-center justify-between font-bold text-xs border-b border-transparent dark:border-slate-700">
                   <span>Totales Vendidos por Forma de Pago</span>
-                  <span>Total Facturado: ${currentSummary.totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                  <span className="font-mono text-white dark:text-sky-300">Total Facturado: ${currentSummary.totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                    <span className="font-medium text-slate-700">💵 Efectivo:</span>
-                    <span className="font-mono font-bold text-emerald-800 text-sm">
+                <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-white dark:bg-slate-900/60">
+                  <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">💵 Efectivo:</span>
+                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm">
                       ${currentSummary.totalsByMethod.cash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                    <span className="font-medium text-slate-700">💳 Tarjeta Débito / Crédito:</span>
-                    <span className="font-mono font-bold text-slate-900 text-sm">
+                  <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">💳 Tarjeta Débito / Crédito:</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
                       ${currentSummary.totalsByMethod.card.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                    <span className="font-medium text-slate-700">📱 QR Mercado Pago:</span>
-                    <span className="font-mono font-bold text-sky-800 text-sm">
+                  <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">📱 QR Mercado Pago:</span>
+                    <span className="font-mono font-bold text-sky-700 dark:text-sky-400 text-sm">
                       ${currentSummary.totalsByMethod.qrMp.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                    <span className="font-medium text-slate-700">🏃 QR Sport Club:</span>
-                    <span className="font-mono font-bold text-indigo-800 text-sm">
+                  <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">🏃 QR Sport Club:</span>
+                    <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400 text-sm">
                       ${currentSummary.totalsByMethod.qrSc.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                    <span className="font-medium text-slate-700">🔄 Canjes / Diferencia Vuelto:</span>
-                    <span className="font-mono font-bold text-amber-800 text-sm">
+                  <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">🔄 Canjes / Diferencia Vuelto:</span>
+                    <span className="font-mono font-bold text-amber-700 dark:text-amber-400 text-sm">
                       ${currentSummary.totalsByMethod.canjes.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                   {currentSummary.totalsByMethod.other > 0 && (
-                    <div className="flex items-center justify-between p-2 rounded bg-[#F4F8FC] border border-[#DCEAF7]">
-                      <span className="font-medium text-slate-700">🌐 Otros / Transferencias:</span>
-                      <span className="font-mono font-bold text-slate-800 text-sm">
+                    <div className="flex items-center justify-between p-2.5 rounded bg-[#F4F8FC] dark:bg-slate-800/80 border border-[#DCEAF7] dark:border-slate-700">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">🌐 Otros / Transferencias:</span>
+                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">
                         ${currentSummary.totalsByMethod.other.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="bg-[#E5EFF8] px-3 py-1.5 border-t border-[#80AED8] flex justify-between text-[11px] text-slate-600">
-                  <span>Cantidad de comprobantes en turno: <strong>{currentSummary.totalSalesCount}</strong></span>
-                  <span>Total cobrado: <strong>${currentSummary.totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</strong></span>
+                <div className="bg-[#E5EFF8] dark:bg-slate-800/90 px-3 py-1.5 border-t border-[#80AED8] dark:border-slate-700 flex justify-between text-[11px] text-slate-600 dark:text-slate-400">
+                  <span>Cantidad de comprobantes en turno: <strong className="text-slate-800 dark:text-slate-200">{currentSummary.totalSalesCount}</strong></span>
+                  <span>Total cobrado: <strong className="text-slate-800 dark:text-slate-200">${currentSummary.totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</strong></span>
                 </div>
               </div>
 
               {/* SECCIÓN 2: Arqueo Teórico de Caja (Efectivo) */}
-              <div className="border border-slate-300 rounded bg-white p-3 space-y-2">
-                <h4 className="font-bold text-[#1B5E91] text-xs uppercase tracking-wide border-b pb-1">
+              <div className="border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800/60 p-3 space-y-2">
+                <h4 className="font-bold text-[#1B5E91] dark:text-sky-400 text-xs uppercase tracking-wide border-b border-slate-200 dark:border-slate-700 pb-1">
                   Conciliación de Efectivo en Cajón
                 </h4>
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Saldo Inicial en Efectivo:</span>
-                    <span className="font-mono font-semibold">${currentSummary.initialBalance.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Saldo Inicial en Efectivo:</span>
+                    <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">${currentSummary.initialBalance.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">(+) Ventas cobradas en Efectivo:</span>
-                    <span className="font-mono font-semibold text-emerald-700">+${currentSummary.totalsByMethod.cash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-slate-600 dark:text-slate-400">(+) Ventas cobradas en Efectivo:</span>
+                    <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">+${currentSummary.totalsByMethod.cash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   {currentSummary.operationsSummary.incomes > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-slate-600">(+) Ingresos Extraordinarios:</span>
-                      <span className="font-mono font-semibold text-emerald-700">+${currentSummary.operationsSummary.incomes.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-slate-600 dark:text-slate-400">(+) Ingresos Extraordinarios:</span>
+                      <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">+${currentSummary.operationsSummary.incomes.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   {currentSummary.operationsSummary.withdrawals > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-slate-600">(-) Egresos Extraordinarios / Retiros:</span>
-                      <span className="font-mono font-semibold text-rose-700">-${currentSummary.operationsSummary.withdrawals.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-slate-600 dark:text-slate-400">(-) Egresos Extraordinarios / Retiros:</span>
+                      <span className="font-mono font-semibold text-rose-700 dark:text-rose-400">-${currentSummary.operationsSummary.withdrawals.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   {currentSummary.operationsSummary.expenses > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-slate-600">(-) Gastos de Sucursal:</span>
-                      <span className="font-mono font-semibold text-rose-700">-${currentSummary.operationsSummary.expenses.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-slate-600 dark:text-slate-400">(-) Gastos de Sucursal:</span>
+                      <span className="font-mono font-semibold text-rose-700 dark:text-rose-400">-${currentSummary.operationsSummary.expenses.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-slate-300 pt-1 text-sm font-bold text-slate-900">
+                  <div className="flex justify-between border-t border-slate-300 dark:border-slate-700 pt-2 text-sm font-bold text-slate-900 dark:text-slate-100">
                     <span>Efectivo Teórico Esperado en Cajón:</span>
-                    <span className="font-mono text-[#1B5E91]">${currentSummary.expectedCash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    <span className="font-mono text-[#1B5E91] dark:text-sky-300 font-extrabold text-base">${currentSummary.expectedCash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               </div>
 
               {/* SECCIÓN 3: Declaración física y diferencia */}
-              <div className="border border-slate-300 rounded bg-[#F8FAFC] p-3 space-y-3">
-                <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wide">
+              <div className="border border-slate-300 dark:border-slate-700 rounded bg-[#F8FAFC] dark:bg-slate-800/80 p-3 space-y-3">
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wide">
                   {isReadOnlyView ? 'Resultado del Cierre' : 'Declaración Física del Vendedor'}
                 </h4>
 
                 {isReadOnlyView ? (
                   <div className="space-y-2 text-xs">
-                    <div className="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
-                      <span className="font-semibold text-slate-700">Efectivo Físico Declarado:</span>
-                      <span className="font-mono font-bold text-sm text-slate-900">
+                    <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-2.5 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Efectivo Físico Declarado:</span>
+                      <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100">
                         ${currentSummary.declaredCash.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
-                      <span className="font-semibold text-slate-700">Diferencia de Arqueo:</span>
+                    <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-2.5 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Diferencia de Arqueo:</span>
                       <span
                         className={`font-mono font-bold text-sm ${
                           currentSummary.difference === 0
-                            ? 'text-emerald-700'
+                            ? 'text-emerald-700 dark:text-emerald-400'
                             : currentSummary.difference > 0
-                            ? 'text-sky-700'
-                            : 'text-rose-700'
+                            ? 'text-sky-700 dark:text-sky-400'
+                            : 'text-rose-700 dark:text-rose-400'
                         }`}
                       >
                         {currentSummary.difference === 0
@@ -223,16 +223,16 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
                       </span>
                     </div>
                     {selectedRegister?.observations && (
-                      <div className="bg-white p-2 rounded border border-slate-200">
-                        <span className="block text-[10px] text-slate-500 font-bold">Observaciones Registradas:</span>
-                        <p className="text-slate-800 italic">{selectedRegister.observations}</p>
+                      <div className="bg-white dark:bg-slate-900 p-2.5 rounded border border-slate-200 dark:border-slate-700">
+                        <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold mb-0.5">Observaciones Registradas:</span>
+                        <p className="text-slate-800 dark:text-slate-200 italic">{selectedRegister.observations}</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                         Efectivo Físico Contado en Cajón ($):
                       </label>
                       <input
@@ -241,9 +241,9 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
                         value={declaredCashInput}
                         onChange={(e) => setDeclaredCashInput(e.target.value)}
                         placeholder="0.00"
-                        className="w-full text-base font-mono font-bold px-3 py-1.5 border border-slate-400 rounded bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1B5E91]"
+                        className="w-full text-base font-mono font-bold px-3 py-1.5 border border-slate-400 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1B5E91] dark:focus:ring-sky-500"
                       />
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         Ingresa el monto de billetes y monedas que hay en el cajón de la caja.
                       </p>
                     </div>
@@ -256,10 +256,10 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
                         <div
                           className={`p-2.5 rounded border text-xs font-bold flex items-center justify-between ${
                             Math.abs(diff) < 0.01
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
                               : diff > 0
-                              ? 'bg-sky-50 text-sky-800 border-sky-300'
-                              : 'bg-rose-50 text-rose-800 border-rose-300'
+                              ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700'
+                              : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
                           }`}
                         >
                           <span>Diferencia vs Efectivo Esperado:</span>
@@ -275,7 +275,7 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
                     })()}
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         Observaciones de Cierre (Opcional):
                       </label>
                       <textarea
@@ -283,7 +283,7 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
                         value={closeObservationsInput}
                         onChange={(e) => setCloseObservationsInput(e.target.value)}
                         placeholder="Notas del turno, entrega de valores, motivo de diferencias..."
-                        className="w-full text-xs p-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1B5E91]"
+                        className="w-full text-xs p-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1B5E91] dark:focus:ring-sky-500"
                       />
                     </div>
                   </div>
@@ -294,7 +294,7 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
         </div>
 
         {/* Pie con botones */}
-        <div className="bg-[#DCEAF7] border-t border-[#9CC2E5] px-4 py-3 flex items-center justify-end gap-2">
+        <div className="bg-[#DCEAF7] dark:bg-slate-800 border-t border-[#9CC2E5] dark:border-slate-700 px-4 py-3 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
@@ -307,12 +307,16 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
               type="button"
               disabled={isSubmittingClose || loadingSummary}
               onClick={onConfirmClose}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-1.5 px-5 rounded text-xs shadow disabled:opacity-50"
+              className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold py-1.5 px-5 rounded text-xs shadow disabled:opacity-50 transition-colors"
             >
               {isSubmittingClose ? 'Procesando Cierre...' : 'Confirmar Cierre de Caja'}
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+};
       </div>
     </div>
   );
