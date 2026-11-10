@@ -106,16 +106,16 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 setOpenMenu(null);
                 onNavigate('BIENVENIDO');
               }}
-              className="flex items-center gap-1.5 rounded px-1.5 py-0.5 hover:bg-white/10 transition-colors"
-              title="Ir a Inicio - JustiMobile"
+              className="flex items-center gap-2 rounded px-1.5 py-0.5 hover:bg-white/10 transition-colors"
+              title="Ir a Inicio - UltraTech Carreras"
             >
               <img
-                src="/justi-logo.svg"
-                alt="Justi Logo"
-                className="h-7 w-8 sm:w-9 object-contain drop-shadow-sm"
+                src="/ultratech-carreras-logo.jpg"
+                alt="UltraTech Carreras"
+                className="h-7 w-7 rounded object-cover drop-shadow-sm border border-amber-400/40"
               />
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center">
-                Justi<span className="text-[#C5E1FF]">Mobile</span>
+                UltraTech<span className="text-amber-300 ml-1">Carreras</span>
               </span>
             </button>
 

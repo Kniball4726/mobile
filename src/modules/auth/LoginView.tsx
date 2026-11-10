@@ -107,30 +107,32 @@ export const LoginView: React.FC<LoginViewProps> = ({
       )}
 
       <div className="w-full bg-[#DCEAF7] dark:bg-slate-800 border-b border-[#C6DDF2] dark:border-slate-700 pt-6 pb-4 px-4 flex flex-col items-center">
-        <img
-          src="/justi-logo.svg"
-          alt="Laboratorio Web Supplements"
-          className="h-20 w-28 object-contain drop-shadow-sm"
-        />
+        <div className="relative mb-2">
+          <img
+            src="/ultratech-carreras-logo.jpg"
+            alt="UltraTech Carreras"
+            className="h-20 w-20 sm:h-24 sm:w-24 object-cover rounded-2xl shadow-lg border-2 border-amber-600/30 ring-2 ring-black/5"
+          />
+        </div>
 
         <div className="mt-1 text-center">
-          <p className="text-xs sm:text-[14px] tracking-[0.12em] font-semibold text-slate-700 dark:text-slate-200 uppercase">
-            LABORATORIO WEB SUPPLEMENTS
+          <p className="text-xs sm:text-[14px] tracking-[0.14em] font-extrabold text-slate-800 dark:text-slate-100 uppercase">
+            ULTRATECH CARRERAS
           </p>
-          <div className="w-full h-[1.5px] bg-slate-600 dark:bg-slate-500 my-0.5" />
+          <div className="w-full h-[1.5px] bg-amber-600/40 dark:bg-amber-400/40 my-0.5" />
           <p className="text-[9px] sm:text-[10px] tracking-[0.16em] font-semibold text-slate-600 dark:text-slate-300 uppercase">
-            BIENESTAR - SALUD - PERFORMANCE
+            ADVANCED TECHNOLOGY IN SPORTS NUTRITION
           </p>
         </div>
 
-        <div className="mt-4 flex items-center gap-1">
-          <span className="text-xl sm:text-2xl font-black text-[#1B5E91] dark:text-sky-400 tracking-tight">
-            Justi<span className="text-[#3F80B5] dark:text-sky-300">Mobile</span>
+        <div className="mt-3 flex items-center gap-1">
+          <span className="text-base sm:text-lg font-black text-[#1B5E91] dark:text-sky-400 tracking-tight">
+            Sistema de Gestión POS &amp; CRM
           </span>
         </div>
 
-        <h1 className="mt-1 text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-100">
-          Ingreso al Sistema
+        <h1 className="mt-0.5 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">
+          Ingreso de Operadores
         </h1>
       </div>
 

@@ -1,7 +1,7 @@
 {
-  "name": "JUSTI Gestión Mobile — Laboratorio Web Supplements",
-  "short_name": "JUSTI Gestión Mobile",
-  "description": "Punto de Venta (POS) y CRM Mobile-First — Laboratorio Web Supplements",
+  "name": "UltraTech Carreras — Gestión POS & CRM",
+  "short_name": "UltraTech Carreras",
+  "description": "Punto de Venta (POS) y CRM Mobile-First — UltraTech Carreras",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#E6F0FA",
@@ -9,9 +9,9 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "/justi-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/ultratech-carreras-logo.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]
