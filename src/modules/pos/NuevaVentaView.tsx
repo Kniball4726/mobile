@@ -37,20 +37,22 @@ const JUSTI_PAYMENT_METHODS: Array<{
   label: string;
   backendMethod: 'CASH' | 'CARD' | 'TRANSFER';
 }> = [
-  { label: 'EFECTIVO', backendMethod: 'CASH' },
-  { label: 'TARJETA DE CRÉDITO/DÉBITO', backendMethod: 'CARD' },
-  { label: 'TRANSFERENCIA BANCARIA', backendMethod: 'TRANSFER' },
-  { label: 'QR Mercadopago', backendMethod: 'TRANSFER' },
-  { label: 'QR SPORT CLUB', backendMethod: 'TRANSFER' },
-  { label: 'RAPPI', backendMethod: 'TRANSFER' },
-  { label: 'CUENTA CORRIENTE', backendMethod: 'TRANSFER' },
-  { label: 'CHEQUE DE TERCEROS', backendMethod: 'TRANSFER' },
+  { label: 'Efectivo', backendMethod: 'CASH' },
+  { label: 'Tarjeta debito/credito', backendMethod: 'CARD' },
+  { label: 'QR mercado pago', backendMethod: 'TRANSFER' },
+  { label: 'QR sport club', backendMethod: 'TRANSFER' },
   { label: 'diferencia vuelto / canjes', backendMethod: 'CASH' },
-  { label: 'RETENCIÓN GANANCIAS', backendMethod: 'TRANSFER' },
-  { label: 'RETENCIÓN IIBB', backendMethod: 'TRANSFER' },
-  { label: 'RETENCIÓN IVA', backendMethod: 'TRANSFER' },
-  { label: 'RETENCIÓN SUSS', backendMethod: 'TRANSFER' },
-  { label: 'RETENCIONES', backendMethod: 'TRANSFER' },
+];
+
+export const JUSTI_CARD_PLANS: string[] = [
+  'CUOTA SIMPLE - 3 SIN INTERES (0.00 %)',
+  'CREDITO AMEX - Amex - 1 Cuota sin interes (0.00 %)',
+  'CREDITO AMEX - Amex - 3 cuotas s/interes (0.00 %)',
+  'VISA - MASTER - CREDITO - bancarizada - 1 cuota sin interes (0.00 %)',
+  'CREDITO CABAL - Cabal - 1 cuota sin interes (0.00 %)',
+  'CREDITO CABAL - Cabal - 3 cuotas s/interes (0.00 %)',
+  'VISA - MASTER - DEBITO - DEBITO (0.00 %)',
+  'NARANJA - Naranja visa o master - 1 cuota sin interes (0.00 %)',
 ];
 
 export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
@@ -65,11 +67,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   onGoToClientes,
   onSaleCompleted,
 }) => {
+  const defaultCustomerLabel = `${user.fullName || 'Operador'} (Consumidor Final)`;
+
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerItem | null>(
     preselectedCustomer,
   );
   const [customerSearch, setCustomerSearch] = useState(
-    preselectedCustomer ? preselectedCustomer.fullName : '',
+    preselectedCustomer ? preselectedCustomer.fullName : defaultCustomerLabel,
   );
   const [customerResults, setCustomerResults] = useState<CustomerItem[]>([]);
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
@@ -85,7 +89,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   const [comprobante, setComprobante] = useState('Nota de Venta');
   const [sucursal, setSucursal] = useState(assignedBranch);
   const [remitoNumber, setRemitoNumber] = useState('');
-  const [paymentLabel, setPaymentLabel] = useState('EFECTIVO');
+  const [paymentLabel, setPaymentLabel] = useState('Efectivo');
+  const [selectedCardPlan, setSelectedCardPlan] = useState<string>(
+    JUSTI_CARD_PLANS[0],
+  );
   const [generalObservations, setGeneralObservations] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
@@ -94,23 +101,26 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     receiptNumber: string;
     totalPesos: number;
     discountApplied: number;
+    cardPlan?: string;
   } | null>(null);
 
   useEffect(() => {
-    if (consumidorFinalMode) {
-      setSelectedCustomer(null);
-      setCustomerSearch('CONSUMIDOR FINAL');
-    } else if (preselectedCustomer) {
+    if (preselectedCustomer) {
       setSelectedCustomer(preselectedCustomer);
       setCustomerSearch(preselectedCustomer.fullName);
+    } else {
+      setSelectedCustomer(null);
+      setCustomerSearch(defaultCustomerLabel);
     }
-  }, [preselectedCustomer, consumidorFinalMode]);
+  }, [preselectedCustomer, consumidorFinalMode, defaultCustomerLabel]);
 
   useEffect(() => {
     if (
       !showCustomerDropdown ||
       customerSearch.trim().length === 0 ||
-      customerSearch === 'CONSUMIDOR FINAL'
+      customerSearch === defaultCustomerLabel ||
+      customerSearch === 'CONSUMIDOR FINAL' ||
+      customerSearch.includes('(Consumidor Final)')
     ) {
       setCustomerResults([]);
       return;
@@ -246,6 +256,14 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     );
   };
 
+  const selectedPayOption =
+    JUSTI_PAYMENT_METHODS.find((m) => m.label === paymentLabel) ||
+    JUSTI_PAYMENT_METHODS[0];
+
+  const isCardPayment =
+    selectedPayOption.backendMethod === 'CARD' ||
+    paymentLabel.toUpperCase().includes('TARJETA');
+
   const handleCheckout = async () => {
     setError(null);
     setLastReceipt(null);
@@ -268,10 +286,6 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         .toString(36)
         .slice(2, 8)}`;
 
-      const selectedPayOption =
-        JUSTI_PAYMENT_METHODS.find((m) => m.label === paymentLabel) ||
-        JUSTI_PAYMENT_METHODS[0];
-
       const preview = await SalesApi.previewSale(token, {
         items: cart.map((item) => ({
           productId: item.product._id,
@@ -284,6 +298,19 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
             applyCrmDiscount,
         ),
       });
+
+      const refParts = [paymentLabel];
+      if (isCardPayment) {
+        refParts.push(`Plan: ${selectedCardPlan}`);
+      }
+      if (selectedCustomer) {
+        refParts.push(`Cliente: ${selectedCustomer.fullName}`);
+      } else {
+        refParts.push(customerSearch || defaultCustomerLabel);
+      }
+      if (remitoNumber) {
+        refParts.push(`Remito: ${remitoNumber}`);
+      }
 
       const response = await SalesApi.createSale(token, idempotencyKey, {
         items: cart.map((item) => ({
@@ -300,9 +327,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           {
             method: selectedPayOption.backendMethod,
             amountCents: preview.totalCents,
-            reference: `${paymentLabel}${
-              remitoNumber ? ` | Remito: ${remitoNumber}` : ''
-            }`,
+            reference: refParts.join(' | '),
           },
         ],
       });
@@ -312,6 +337,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         receiptNumber: response.sale.receiptNumber,
         totalPesos: finalPesos,
         discountApplied: response.sale.discountPercentageApplied,
+        cardPlan: isCardPayment ? selectedCardPlan : undefined,
       });
 
       if (selectedCustomer && response.sale.discountPercentageApplied > 0) {
@@ -328,6 +354,8 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
       setCart([]);
       setGeneralObservations('');
+      setSelectedCustomer(null);
+      setCustomerSearch(defaultCustomerLabel);
       onSaleCompleted(finalPesos);
     } catch (err: unknown) {
       setError(
@@ -379,6 +407,11 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </strong>
               {lastReceipt.discountApplied > 0 &&
                 ` (Descuento CRM ${lastReceipt.discountApplied}% consumido automáticamente)`}
+              {lastReceipt.cardPlan && (
+                <>
+                  {' '}• <strong>Plan Tarjeta:</strong> {lastReceipt.cardPlan}
+                </>
+              )}
               .
             </span>
           </div>
@@ -419,13 +452,18 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       type="text"
                       value={customerSearch}
                       onFocus={() => setShowCustomerDropdown(true)}
+                      onBlur={() => {
+                        if (!customerSearch.trim()) {
+                          setCustomerSearch(defaultCustomerLabel);
+                        }
+                      }}
                       onChange={(e) => {
                         setCustomerSearch(e.target.value);
                         setSelectedCustomer(null);
                         setShowCustomerDropdown(true);
                       }}
                       placeholder="Buscar cliente por nombre o email..."
-                      className="justi-input w-full"
+                      className="justi-input w-full font-medium"
                     />
 
                     {showCustomerDropdown && customerResults.length > 0 && (
@@ -488,26 +526,40 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       ({selectedCustomer.email})
                     </span>
                   </div>
-                  {selectedCustomer.activeDiscount?.isAvailable &&
-                  selectedCustomer.activeDiscount.percentage > 0 ? (
-                    <label className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={applyCrmDiscount}
-                        onChange={(e) => setApplyCrmDiscount(e.target.checked)}
-                      />
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Aplicar {selectedCustomer.activeDiscount.percentage}% Dto.
-                      Único
-                    </label>
-                  ) : (
-                    <span className="text-amber-800 dark:text-amber-400 font-semibold">
-                      Sin descuento activo{' '}
-                      {selectedCustomer.activeDiscount?.consumedInSaleNumber
-                        ? `(Ya usado en ${selectedCustomer.activeDiscount.consumedInSaleNumber})`
-                        : ''}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {selectedCustomer.activeDiscount?.isAvailable &&
+                    selectedCustomer.activeDiscount.percentage > 0 ? (
+                      <label className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={applyCrmDiscount}
+                          onChange={(e) => setApplyCrmDiscount(e.target.checked)}
+                        />
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Aplicar {selectedCustomer.activeDiscount.percentage}% Dto.
+                        Único
+                      </label>
+                    ) : (
+                      <span className="text-amber-800 dark:text-amber-400 font-semibold">
+                        Sin descuento activo{' '}
+                        {selectedCustomer.activeDiscount?.consumedInSaleNumber
+                          ? `(Ya usado en ${selectedCustomer.activeDiscount.consumedInSaleNumber})`
+                          : ''}
+                      </span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCustomer(null);
+                        setCustomerSearch(defaultCustomerLabel);
+                      }}
+                      className="text-[11px] font-bold text-red-600 dark:text-red-400 hover:underline ml-1"
+                      title="Quitar cliente y volver a Consumidor Final"
+                    >
+                      (Quitar)
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -968,7 +1020,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           {/* Vista Móvil (< md): Apilada sin scroll horizontal */}
           <div className="md:hidden p-2.5 space-y-2.5 text-xs">
             <div>
-              <label className="block font-bold text-[#1B5E91] mb-1">
+              <label className="block font-bold text-[#1B5E91] dark:text-sky-300 mb-1">
                 Forma de Pago (#1):
               </label>
               <select
@@ -984,9 +1036,28 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </select>
             </div>
 
+            {isCardPayment && (
+              <div className="rounded border border-[#9CC2E5] dark:border-slate-700 bg-[#F4F9FE] dark:bg-slate-800/90 p-2 space-y-1">
+                <label className="block text-[11px] font-bold text-[#1B5E91] dark:text-sky-300">
+                  Plan:
+                </label>
+                <select
+                  value={selectedCardPlan}
+                  onChange={(e) => setSelectedCardPlan(e.target.value)}
+                  className="justi-select w-full text-xs font-semibold"
+                >
+                  {JUSTI_CARD_PLANS.map((plan) => (
+                    <option key={plan} value={plan}>
+                      {plan}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
                   Sin Desc/Rec
                 </label>
                 <input
@@ -997,25 +1068,25 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
                   % Desc CRM
                 </label>
                 <input
                   type="text"
                   readOnly
                   value={`${activeDiscountPercent.toFixed(1)}%`}
-                  className="justi-input w-full text-right font-mono text-xs font-bold text-emerald-800"
+                  className="justi-input w-full text-right font-mono text-xs font-bold text-emerald-800 dark:text-emerald-400"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-[#1B5E91] mb-0.5">
+                <label className="block text-[10px] font-bold text-[#1B5E91] dark:text-sky-300 mb-0.5">
                   A Cobrar
                 </label>
                 <input
                   type="text"
                   readOnly
                   value={`$${totals.finalTotalPesos.toFixed(2)}`}
-                  className="justi-input w-full text-right font-mono text-xs font-extrabold text-[#1B5E91]"
+                  className="justi-input w-full text-right font-mono text-xs font-extrabold text-[#1B5E91] dark:text-sky-300"
                 />
               </div>
             </div>
@@ -1025,7 +1096,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           <div className="hidden md:block p-2.5 overflow-x-auto">
             <table className="w-full border-collapse text-xs">
               <thead>
-                <tr className="text-[#1B5E91] border-b border-[#9CC2E5]">
+                <tr className="text-[#1B5E91] dark:text-sky-300 border-b border-[#9CC2E5] dark:border-slate-700">
                   <th className="py-1 px-2 text-left w-8">#</th>
                   <th className="py-1 px-2 text-left">Forma de Pago</th>
                   <th className="py-1 px-2 text-right">Importe sin Desc/Rec</th>
@@ -1035,7 +1106,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-[#E5E5F7] border-b border-slate-300">
+                <tr className="bg-[#E5E5F7] dark:bg-slate-800/60 border-b border-slate-300 dark:border-slate-700">
                   <td className="p-1.5 font-bold">1</td>
                   <td className="p-1.5">
                     <select
@@ -1058,10 +1129,31 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       className="justi-input w-28 text-right font-bold"
                     />
                   </td>
-                  <td className="p-1.5 text-slate-600 text-[11px]">
-                    {selectedCustomer
-                      ? `Cliente: ${selectedCustomer.fullName}`
-                      : 'Venta Mostrador Sucursal PASTEUR'}
+                  <td className="p-1.5 text-xs">
+                    {isCardPayment ? (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap text-xs">
+                          Plan:
+                        </span>
+                        <select
+                          value={selectedCardPlan}
+                          onChange={(e) => setSelectedCardPlan(e.target.value)}
+                          className="justi-select text-xs font-semibold w-full max-w-sm"
+                        >
+                          {JUSTI_CARD_PLANS.map((plan) => (
+                            <option key={plan} value={plan}>
+                              {plan}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <span className="text-slate-600 dark:text-slate-400 text-[11px]">
+                        {selectedCustomer
+                          ? `Cliente: ${selectedCustomer.fullName}`
+                          : customerSearch || defaultCustomerLabel}
+                      </span>
+                    )}
                   </td>
                   <td className="p-1.5 text-right font-mono">
                     <input
@@ -1076,7 +1168,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       type="text"
                       readOnly
                       value={totals.finalTotalPesos.toFixed(2)}
-                      className="justi-input w-28 text-right font-extrabold text-[#1B5E91]"
+                      className="justi-input w-28 text-right font-extrabold text-[#1B5E91] dark:text-sky-300"
                     />
                   </td>
                 </tr>
