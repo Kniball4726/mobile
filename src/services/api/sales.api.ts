@@ -1,4 +1,8 @@
-import { SalePreviewResponse, SaleRecord } from '../../types/domain.types';
+import {
+  BusinessIntelligenceData,
+  SalePreviewResponse,
+  SaleRecord,
+} from '../../types/domain.types';
 import { request } from './client';
 
 export const SalesApi = {
@@ -136,6 +140,21 @@ export const SalesApi = {
   }> {
     return request(
       `/sales/mercadopago/order-status/${encodeURIComponent(externalReference)}`,
+      { method: 'GET' },
+      token,
+    );
+  },
+
+  getBusinessIntelligence(
+    token: string,
+    timeRange: 'today' | '7d' | '30d' | 'all' = '7d',
+    branch = 'ALL',
+  ): Promise<BusinessIntelligenceData> {
+    const params = new URLSearchParams();
+    if (timeRange) params.append('timeRange', timeRange);
+    if (branch) params.append('branch', branch);
+    return request<BusinessIntelligenceData>(
+      `/sales/analytics/business-intelligence?${params.toString()}`,
       { method: 'GET' },
       token,
     );

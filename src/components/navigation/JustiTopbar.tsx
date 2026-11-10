@@ -15,6 +15,7 @@ import {
   Users,
   Sun,
   Moon,
+  LineChart,
 } from 'lucide-react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { NavigationDrawer } from './NavigationDrawer';
@@ -322,6 +323,22 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
 
                   {isAdmin && (
                     <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenMenu(null);
+                          onNavigate('BIENVENIDO');
+                        }}
+                        className={`justi-nav-pill text-xs px-2.5 ${
+                          activeScreen === 'BIENVENIDO'
+                            ? 'justi-nav-pill-active'
+                            : ''
+                        }`}
+                      >
+                        <LineChart className="mr-1 h-3.5 w-3.5 text-amber-300" />
+                        <span>Dashboard BI</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => {

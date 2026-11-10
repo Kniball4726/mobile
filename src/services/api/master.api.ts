@@ -94,8 +94,11 @@ export const MasterApi = {
 
   revokeApiKey(token: string, id: string): Promise<ApiKeyRecord> {
     return request<ApiKeyRecord>(
-      `/master/api-keys/${id}/revoke`,
-      { method: 'PATCH' },
+      `/master/api-keys/${encodeURIComponent(id)}/revoke`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({}),
+      },
       token,
     );
   },
@@ -105,7 +108,10 @@ export const MasterApi = {
   ): Promise<{ revokedUsersCount: number; executedAt: string }> {
     return request(
       '/master/security/revoke-all-sessions',
-      { method: 'POST' },
+      {
+        method: 'POST',
+        body: JSON.stringify({}),
+      },
       token,
     );
   },

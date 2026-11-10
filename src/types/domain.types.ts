@@ -230,6 +230,76 @@ export interface SaleRecord {
   createdAt: string;
 }
 
+export interface BusinessIntelligenceData {
+  timeRange: 'today' | '7d' | '30d' | 'all';
+  branch: string;
+  generatedAt: string;
+  summary: {
+    totalRevenuePesos: number;
+    totalTransactions: number;
+    averageTicketPesos: number;
+    totalItemsSold: number;
+    totalDiscountsPesos: number;
+    cancelledCount: number;
+    cancelledRevenuePesos: number;
+    totalExpensesPesos: number;
+    operatingCashFlowPesos: number;
+    digitalPaymentRatio: number;
+  };
+  dailyTrend: Array<{
+    date: string;
+    label: string;
+    totalPesos: number;
+    transactions: number;
+    localesPesos: number;
+    carrerasPesos: number;
+  }>;
+  paymentMix: Array<{
+    method: string;
+    label: string;
+    totalPesos: number;
+    count: number;
+    percentage: number;
+  }>;
+  topProducts: Array<{
+    productId: string;
+    sku: string;
+    name: string;
+    unitsSold: number;
+    totalRevenuePesos: number;
+    sharePercentage: number;
+  }>;
+  branchBenchmark: {
+    locales: {
+      totalPesos: number;
+      transactions: number;
+      averageTicketPesos: number;
+      sharePercentage: number;
+    };
+    carreras: {
+      totalPesos: number;
+      transactions: number;
+      averageTicketPesos: number;
+      sharePercentage: number;
+    };
+  };
+  staffLeaderboard: Array<{
+    cashierId: string;
+    fullName: string;
+    email: string;
+    branch: string;
+    totalSalesPesos: number;
+    transactionsCount: number;
+    averageTicketPesos: number;
+  }>;
+  crmInsights: {
+    regularSalesCount: number;
+    crmSalesCount: number;
+    crmAdoptionRate: number;
+    totalCrmDiscountPesos: number;
+  };
+}
+
 export type ActiveScreen =
   | 'BIENVENIDO'
   | 'NUEVA_VENTA'
