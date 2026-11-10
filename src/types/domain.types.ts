@@ -99,7 +99,8 @@ export interface CustomerItem {
 export interface CartItem {
   product: ProductItem;
   quantity: number;
-  observations: string;
+  observations?: string;
+  customPrice?: number;
 }
 
 export interface SalePreviewResponse {

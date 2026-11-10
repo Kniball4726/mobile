@@ -5,7 +5,11 @@ export const SalesApi = {
   previewSale(
     token: string,
     payload: {
-      items: Array<{ productId: string; quantity: number }>;
+      items: Array<{
+        productId: string;
+        quantity: number;
+        customPriceCents?: number;
+      }>;
       customerId?: string | null;
       applyCustomerDiscount: boolean;
     },
@@ -24,7 +28,11 @@ export const SalesApi = {
     token: string,
     idempotencyKey: string,
     payload: {
-      items: Array<{ productId: string; quantity: number }>;
+      items: Array<{
+        productId: string;
+        quantity: number;
+        customPriceCents?: number;
+      }>;
       customerId?: string | null;
       applyCustomerDiscount: boolean;
       payments: Array<{

@@ -157,7 +157,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         };
         return updated;
       }
-      return [...prev, { product, quantity: 1, observations: '' }];
+      return [...prev, { product, quantity: 1, customPrice: product.price }];
     });
     setCodeSearch('');
   }, []);
@@ -223,10 +223,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   }, [selectedCustomer, applyCrmDiscount]);
 
   const totals = useMemo(() => {
-    const grossPesos = cart.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0,
-    );
+    const grossPesos = cart.reduce((acc, item) => {
+      const price =
+        typeof item.customPrice === 'number'
+          ? item.customPrice
+          : item.product.price;
+      return acc + price * item.quantity;
+    }, 0);
     const discountPesos = Number(
       ((grossPesos * activeDiscountPercent) / 100).toFixed(2),
     );
@@ -254,6 +257,16 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     setCart((prev) =>
       prev.map((i) =>
         i.product._id === productId ? { ...i, quantity: newQty } : i,
+      ),
+    );
+  };
+
+  const updatePrice = (productId: string, newPrice: number) => {
+    const validPrice =
+      isNaN(newPrice) || newPrice < 0 ? 0 : Number(newPrice.toFixed(2));
+    setCart((prev) =>
+      prev.map((i) =>
+        i.product._id === productId ? { ...i, customPrice: validPrice } : i,
       ),
     );
   };
@@ -292,6 +305,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         items: cart.map((item) => ({
           productId: item.product._id,
           quantity: item.quantity,
+          customPriceCents:
+            typeof item.customPrice === 'number'
+              ? Math.round(item.customPrice * 100)
+              : undefined,
         })),
         customerId: selectedCustomer ? selectedCustomer._id : null,
         applyCustomerDiscount: Boolean(
@@ -318,6 +335,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         items: cart.map((item) => ({
           productId: item.product._id,
           quantity: item.quantity,
+          customPriceCents:
+            typeof item.customPrice === 'number'
+              ? Math.round(item.customPrice * 100)
+              : undefined,
         })),
         customerId: selectedCustomer ? selectedCustomer._id : null,
         applyCustomerDiscount: Boolean(
@@ -682,9 +703,9 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   value={codeSearch}
                   onChange={(e) => setCodeSearch(e.target.value)}
                   placeholder="Código EAN-13, SKU o nombre del suplemento..."
-                  className="justi-input w-full pl-8 py-2 sm:py-1.5 font-medium"
+                  className="justi-input w-full pl-9 py-2.5 sm:py-2 text-sm font-semibold"
                 />
-                <Barcode className="absolute left-2.5 top-2.5 sm:top-2 h-4 w-4 text-[#1B5E91]" />
+                <Barcode className="absolute left-2.5 top-3 sm:top-2.5 h-4 w-4 text-[#1B5E91]" />
               </div>
               <div className="grid grid-cols-2 sm:flex gap-1.5">
                 <button
@@ -744,7 +765,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </div>
             ) : (
               cart.map((item) => {
-                const unitPrice = item.product.price;
+                const unitPrice =
+                  typeof item.customPrice === 'number'
+                    ? item.customPrice
+                    : item.product.price;
                 const priceWithDesc = Number(
                   (unitPrice * (1 - activeDiscountPercent / 100)).toFixed(2),
                 );
@@ -757,28 +781,30 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                     className="rounded border border-[#9CC2E5] bg-white p-2.5 text-xs shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <span className="font-mono text-[11px] font-bold text-[#1B5E91]">
                           Cód: {item.product.sku}{' '}
                           {item.product.barcode
                             ? `• EAN: ${item.product.barcode}`
                             : ''}
                         </span>
-                        <p className="font-bold text-slate-900 leading-snug">
+                        <p className="font-bold text-sm text-slate-900 leading-snug">
                           {item.product.name}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.product._id, 0)}
-                        className="shrink-0 rounded border border-red-300 bg-red-50 p-1.5 text-red-700"
+                        className="shrink-0 rounded border border-red-300 bg-red-50 p-1.5 text-red-700 hover:bg-red-100"
+                        title="Eliminar artículo"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
 
-                    <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-100 pt-2">
+                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2">
                       <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-slate-600 mr-1">Cant:</span>
                         <button
                           type="button"
                           onClick={() =>
@@ -802,18 +828,32 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                         </button>
                       </div>
 
-                      <div className="text-right">
-                        <div className="text-[11px] text-slate-500">
-                          Unit: ${unitPrice.toLocaleString('es-AR')}
-                          {activeDiscountPercent > 0 && (
-                            <span className="ml-1 font-bold text-emerald-700">
-                              (-{activeDiscountPercent}%)
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm font-extrabold text-[#1B5E91]">
-                          ${lineTotal.toLocaleString('es-AR')}
-                        </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-slate-700">Precio c/imp: $</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={unitPrice}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                            updatePrice(item.product._id, isNaN(val) ? 0 : val);
+                          }}
+                          className="justi-input w-24 text-right font-mono font-bold py-1 px-1.5 text-xs text-slate-900 focus:bg-amber-50"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-1 flex items-center justify-between text-xs border-t border-slate-100 pt-1.5">
+                      <div className="text-[11px] text-slate-500">
+                        {activeDiscountPercent > 0 && (
+                          <span className="font-bold text-emerald-700">
+                            Desc: -{activeDiscountPercent}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm font-extrabold text-[#1B5E91]">
+                        Subtotal: ${lineTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </div>
                     </div>
                   </div>
@@ -827,37 +867,38 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
             <table className="w-full border-collapse text-[11px]">
               <thead>
                 <tr className="bg-[#DCEAF7] text-[#1B5E91] border-b border-[#9CC2E5]">
-                  <th className="py-1.5 px-2 text-left">Código</th>
-                  <th className="py-1.5 px-2 text-left">
+                  <th className="py-2 px-2 text-left">Código</th>
+                  <th className="py-2 px-2 text-left">
                     Rubro -&gt; Subrubro
                   </th>
-                  <th className="py-1.5 px-2 text-left">Marca</th>
-                  <th className="py-1.5 px-2 text-left">Artículo</th>
-                  <th className="py-1.5 px-2 text-left">Observaciones</th>
-                  <th className="py-1.5 px-2 text-center">Cantidad</th>
-                  <th className="py-1.5 px-2 text-right">
+                  <th className="py-2 px-2 text-left">Marca</th>
+                  <th className="py-2 px-3 text-left min-w-[280px] w-1/3 text-xs font-bold">
+                    Artículo / Producto
+                  </th>
+                  <th className="py-2 px-2 text-center">Cantidad</th>
+                  <th className="py-2 px-2 text-right min-w-[130px]">
                     Precio (Con Impuestos)
                   </th>
-                  <th className="py-1.5 px-2 text-right">Desc/Rec (%)</th>
-                  <th className="py-1.5 px-2 text-right">
+                  <th className="py-2 px-2 text-right">Desc/Rec (%)</th>
+                  <th className="py-2 px-2 text-right">
                     Precio Con Desc/Rec
                   </th>
-                  <th className="py-1.5 px-2 text-right">
+                  <th className="py-2 px-2 text-right">
                     Subtotal (Sin Impuestos)
                   </th>
-                  <th className="py-1.5 px-2 text-center">IVA (%)</th>
-                  <th className="py-1.5 px-2 text-center">Imp. Int. (%)</th>
-                  <th className="py-1.5 px-2 text-right">
+                  <th className="py-2 px-2 text-center">IVA (%)</th>
+                  <th className="py-2 px-2 text-center">Imp. Int. (%)</th>
+                  <th className="py-2 px-2 text-right">
                     Subtotal (Con Impuestos)
                   </th>
-                  <th className="py-1.5 px-2 text-center w-10"></th>
+                  <th className="py-2 px-2 text-center w-10"></th>
                 </tr>
               </thead>
               <tbody>
                 {cart.length === 0 ? (
                   <tr className="bg-[#E5E5F7]">
                     <td
-                      colSpan={14}
+                      colSpan={13}
                       className="py-3 px-3 text-center text-slate-500"
                     >
                       Sin artículos cargados. Use el lector de código de barras
@@ -866,7 +907,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   </tr>
                 ) : (
                   cart.map((item) => {
-                    const unitPrice = item.product.price;
+                    const unitPrice =
+                      typeof item.customPrice === 'number'
+                        ? item.customPrice
+                        : item.product.price;
                     const descPercent = activeDiscountPercent;
                     const priceWithDesc = Number(
                       (unitPrice * (1 - descPercent / 100)).toFixed(2),
@@ -897,25 +941,8 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                             ULTRA TECH
                           </span>
                         </td>
-                        <td className="p-1.5 font-semibold text-slate-900">
+                        <td className="p-2 font-bold text-slate-900 text-xs">
                           {item.product.name}
-                        </td>
-                        <td className="p-1.5">
-                          <input
-                            type="text"
-                            value={item.observations}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setCart((prev) =>
-                                prev.map((c) =>
-                                  c.product._id === item.product._id
-                                    ? { ...c, observations: val }
-                                    : c,
-                                ),
-                              );
-                            }}
-                            className="justi-input w-28"
-                          />
                         </td>
                         <td className="p-1.5 text-center">
                           <input
@@ -932,7 +959,24 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                           />
                         </td>
                         <td className="p-1.5 text-right font-mono bg-white/80">
-                          {unitPrice.toFixed(2)}
+                          <div className="flex items-center justify-end gap-1">
+                            <span className="text-slate-500 font-bold">$</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={unitPrice}
+                              onChange={(e) => {
+                                const val =
+                                  e.target.value === ''
+                                    ? 0
+                                    : parseFloat(e.target.value);
+                                updatePrice(item.product._id, isNaN(val) ? 0 : val);
+                              }}
+                              className="justi-input w-28 text-right font-mono font-bold py-1 px-1.5 text-xs text-slate-900 focus:bg-amber-50"
+                              title="Precio unitario con impuestos modificable por el vendedor"
+                            />
+                          </div>
                         </td>
                         <td className="p-1.5 text-right font-mono font-bold text-emerald-800 bg-white/80">
                           {descPercent > 0
