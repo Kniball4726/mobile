@@ -79,7 +79,13 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         MasterApi.getSettings(token),
         MasterApi.listApiKeys(token),
         MasterApi.listAuditLogs(token),
-        MasterApi.getMercadoPagoSettings(token),
+        MasterApi.getMercadoPagoSettings(token).catch((err: unknown) => {
+          console.warn(
+            'Endpoint de Mercado Pago no disponible en el servidor actual:',
+            err,
+          );
+          return null;
+        }),
       ]);
       setSettings(cfg);
       setMaxDiscountInput(cfg.maxCrmDiscountPercentage);
@@ -88,15 +94,17 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       setApiKeys(keys);
       setAuditLogs(logs);
 
-      // Cargar configuración de Mercado Pago
-      setMpSettings(mpCfg);
-      setMpEnabled(Boolean(mpCfg.isEnabled));
-      setMpSandbox(mpCfg.isSandbox ?? true);
-      setMpPublicKey(mpCfg.publicKey || '');
-      setMpAccessToken(mpCfg.accessTokenMasked || '');
-      setMpWebhookSecret(mpCfg.hasWebhookSecret ? '••••••••••••••••' : '');
-      setMpPosId(mpCfg.posId || '');
-      setMpUserId(mpCfg.userId || '');
+      // Cargar configuración de Mercado Pago (si está desplegada en el servidor)
+      if (mpCfg) {
+        setMpSettings(mpCfg);
+        setMpEnabled(Boolean(mpCfg.isEnabled));
+        setMpSandbox(mpCfg.isSandbox ?? true);
+        setMpPublicKey(mpCfg.publicKey || '');
+        setMpAccessToken(mpCfg.accessTokenMasked || '');
+        setMpWebhookSecret(mpCfg.hasWebhookSecret ? '••••••••••••••••' : '');
+        setMpPosId(mpCfg.posId || '');
+        setMpUserId(mpCfg.userId || '');
+      }
     } catch (err: unknown) {
       setError(
         err instanceof Error
@@ -212,10 +220,14 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       );
       await loadMasterData();
     } catch (err: unknown) {
-      setError(
+      const rawMsg =
         err instanceof Error
           ? err.message
-          : 'Error al actualizar credenciales de Mercado Pago.',
+          : 'Error al actualizar credenciales de Mercado Pago.';
+      setError(
+        rawMsg.includes('Cannot') || rawMsg.includes('404')
+          ? 'El endpoint de integración de Mercado Pago aún no está desplegado en el servidor actual de Render.'
+          : rawMsg,
       );
     } finally {
       setSavingMp(false);
@@ -241,8 +253,12 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
       });
       setSuccess(res.message);
     } catch (err: unknown) {
-      const msg =
+      const rawMsg =
         err instanceof Error ? err.message : 'Fallo en la prueba de conexión';
+      const msg =
+        rawMsg.includes('Cannot') || rawMsg.includes('404')
+          ? 'El endpoint de prueba de Mercado Pago aún no está desplegado en el servidor actual de Render.'
+          : rawMsg;
       setMpTestResult({ success: false, message: msg });
       setError(msg);
     } finally {
