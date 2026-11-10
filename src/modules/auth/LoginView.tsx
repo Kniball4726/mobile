@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthApi } from '../../services/api.service';
 import { LoginResponse } from '../../types/domain.types';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, ShieldAlert, Clock } from 'lucide-react';
 
 interface LoginViewProps {
   onLoginSuccess: (session: LoginResponse) => void;
@@ -18,6 +18,21 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
+
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setLockoutSeconds((prev) => {
+        if (prev <= 1) {
+          setError(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutSeconds]);
 
   const isDarkMode =
     typeof isDark === 'boolean'
@@ -41,12 +56,29 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockoutSeconds > 0) return;
+
     setError(null);
     setLoading(true);
     try {
       const response = await AuthApi.login(email.trim(), password);
       onLoginSuccess(response);
-    } catch (err: unknown) {
+    } catch (err: any) {
+      const isRateLimit =
+        err?.status === 429 ||
+        err?.code === 'TOO_MANY_LOGIN_ATTEMPTS' ||
+        err?.code === 'RATE_LIMIT_EXCEEDED';
+
+      const regexMatch = err?.message?.match(/(\d+)\s*segundos/i);
+      const parsedSeconds = regexMatch ? parseInt(regexMatch[1], 10) : 0;
+      const retryAfter =
+        err?.details?.retryAfterSeconds ||
+        (parsedSeconds > 0 ? parsedSeconds : isRateLimit ? 60 : 0);
+
+      if (isRateLimit || retryAfter > 0) {
+        setLockoutSeconds(retryAfter);
+      }
+
       setError(
         err instanceof Error
           ? err.message
@@ -107,8 +139,28 @@ export const LoginView: React.FC<LoginViewProps> = ({
           onSubmit={handleSubmit}
           className="w-full max-w-sm flex flex-col items-center space-y-3.5"
         >
-          {error && (
-            <div className="w-full justi-alert-error text-center">{error}</div>
+          {lockoutSeconds > 0 ? (
+            <div className="w-full p-3 rounded-lg border border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 text-xs flex flex-col gap-1.5 shadow-sm">
+              <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300">
+                <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400 animate-pulse" />
+                <span>Bloqueo temporal por seguridad (Anti-Fuerza Bruta)</span>
+              </div>
+              <p className="text-[11px] leading-relaxed">
+                Se detectaron múltiples intentos fallidos. Por protección de la cuenta y del servidor, el acceso está restringido.
+              </p>
+              <div className="flex items-center justify-between pt-1 font-semibold text-xs text-amber-700 dark:text-amber-300 border-t border-amber-200 dark:border-amber-800/60">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" /> Reintentando en:
+                </span>
+                <span className="px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-800 font-mono font-bold text-amber-900 dark:text-amber-100">
+                  {lockoutSeconds} seg
+                </span>
+              </div>
+            </div>
+          ) : (
+            error && (
+              <div className="w-full justi-alert-error text-center">{error}</div>
+            )
           )}
 
           <div className="w-full flex flex-col sm:flex-row sm:items-center justify-center gap-1 sm:gap-3">
@@ -118,11 +170,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <input
               type="email"
               required
+              disabled={lockoutSeconds > 0}
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={inputStyle}
-              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors"
+              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="usuario@justi.com.ar"
             />
           </div>
@@ -134,11 +187,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <input
               type="password"
               required
+              disabled={lockoutSeconds > 0}
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={inputStyle}
-              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors"
+              className="justi-input w-full sm:w-60 font-medium placeholder-slate-400 dark:placeholder-slate-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="••••••••••"
             />
           </div>
@@ -146,10 +200,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
           <div className="w-full sm:w-auto pt-1 flex justify-center">
             <button
               type="submit"
-              disabled={loading}
-              className="justi-btn-primary w-full sm:w-auto px-8 py-2.5 sm:py-1.5 text-sm sm:text-xs font-bold shadow-sm disabled:opacity-60"
+              disabled={loading || lockoutSeconds > 0}
+              className="justi-btn-primary w-full sm:w-auto px-8 py-2.5 sm:py-1.5 text-sm sm:text-xs font-bold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {lockoutSeconds > 0 ? (
+                <>
+                  <Clock className="h-3.5 w-3.5 animate-spin" />
+                  <span>Bloqueado ({lockoutSeconds}s)</span>
+                </>
+              ) : loading ? (
+                'Ingresando...'
+              ) : (
+                'Ingresar'
+              )}
             </button>
           </div>
         </form>

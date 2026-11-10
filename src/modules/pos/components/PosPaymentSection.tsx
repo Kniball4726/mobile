@@ -1,5 +1,6 @@
 import React from 'react';
 import { CustomerItem } from '../../../types/domain.types';
+import { QrCode } from 'lucide-react';
 
 interface PosPaymentSectionProps {
   paymentLabel: string;
@@ -71,6 +72,17 @@ export const PosPaymentSection: React.FC<PosPaymentSectionProps> = ({
               ))}
             </select>
           </div>
+
+          {paymentLabel === 'QR mercado pago' && (
+            <div className="rounded border border-[#009EE3] bg-[#EBF7FD] dark:bg-sky-950/40 p-2 text-xs flex items-center justify-between gap-2">
+              <span className="text-[#009EE3] font-bold text-[11px] flex items-center gap-1.5">
+                <QrCode className="h-4 w-4" /> Cobro QR Dinámico Mercado Pago
+              </span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-300">
+                Se abrirá el QR interactivo al cobrar
+              </span>
+            </div>
+          )}
 
           {isCardPayment && (
             <div className="rounded border border-[#9CC2E5] dark:border-slate-700 bg-[#F4F9FE] dark:bg-slate-800/90 p-2 space-y-1">
@@ -183,6 +195,10 @@ export const PosPaymentSection: React.FC<PosPaymentSectionProps> = ({
                         ))}
                       </select>
                     </div>
+                  ) : paymentLabel === 'QR mercado pago' ? (
+                    <span className="text-[#009EE3] font-bold text-xs flex items-center gap-1">
+                      <QrCode className="h-3.5 w-3.5" /> Cobro QR Dinámico Mercado Pago
+                    </span>
                   ) : (
                     <span className="text-slate-600 dark:text-slate-400 text-[11px]">
                       {selectedCustomer

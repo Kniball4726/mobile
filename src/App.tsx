@@ -21,8 +21,9 @@ import { TesoreriaView } from './modules/treasury/TesoreriaView';
 import { MasterControlView } from './modules/master/MasterControlView';
 import { UsuariosView } from './modules/users/UsuariosView';
 import { ProductosView } from './modules/products/ProductosView';
-import { useTheme } from './hooks/useTheme';
 import { useAuthSession } from './hooks/useAuthSession';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
+import { useTheme } from './hooks/useTheme';
 
 const CATALOG_CACHE_KEY = 'justi_pos_catalog_cache_v1';
 const REGISTERS_STORAGE_KEY = 'justi_pos_registers_v1';
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>('BIENVENIDO');
   const { session, handleLoginSuccess, handleLogout } =
     useAuthSession(setActiveScreen);
+  const { isOnline, pendingCount, syncNow } = useNetworkStatus();
 
   const [tesoreriaTab, setTesoreriaTab] = useState<TesoreriaTab>('CAJAS');
   const [consumidorFinalMode, setConsumidorFinalMode] =
@@ -39,7 +41,18 @@ export const App: React.FC = () => {
   const [selectedCustomerForSale, setSelectedCustomerForSale] =
     useState<CustomerItem | null>(null);
 
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>(() => {
+    try {
+      const cached = localStorage.getItem(CATALOG_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return parsed.categories || [];
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  });
   const [products, setProducts] = useState<ProductItem[]>(() => {
     try {
       const cached = localStorage.getItem(CATALOG_CACHE_KEY);
@@ -52,6 +65,13 @@ export const App: React.FC = () => {
     }
     return [];
   });
+
+  // Auto-sincronización de ventas offline al volver la conexión
+  useEffect(() => {
+    if (isOnline && session?.accessToken && pendingCount > 0) {
+      syncNow(session.accessToken);
+    }
+  }, [isOnline, session?.accessToken, pendingCount, syncNow]);
 
   // Estado de Cajas de Tesorería
   const [registers, setRegisters] = useState<CashRegisterRecord[]>(() => {
@@ -302,6 +322,7 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#E8F2FC] dark:bg-slate-900 transition-colors duration-200">
       <JustiTopbar
+        token={session.accessToken}
         user={session.user}
         activeScreen={activeScreen}
         tesoreriaTab={tesoreriaTab}
@@ -325,21 +346,14 @@ export const App: React.FC = () => {
           )
         )}
 
-        {activeScreen === 'CLIENTES' && (
+        {activeScreen === 'CLIENTES' && session.user.role !== 'MASTER' && (
           <ClientesView
             token={session.accessToken}
-            canSell={
-              session.user.role === 'CASHIER' || session.user.role === 'MASTER'
-            }
+            canSell={session.user.role === 'CASHIER'}
             userBranch={userBranch}
-            isBranchLocked={
-              session.user.role !== 'ADMIN' && session.user.role !== 'MASTER'
-            }
+            isBranchLocked={session.user.role !== 'ADMIN'}
             onSelectCustomerForSale={(customer) => {
-              if (
-                session.user.role !== 'CASHIER' &&
-                session.user.role !== 'MASTER'
-              ) {
+              if (session.user.role !== 'CASHIER') {
                 return;
               }
               setSelectedCustomerForSale(customer);
@@ -350,7 +364,8 @@ export const App: React.FC = () => {
         )}
 
         {activeScreen === 'VENTAS_USUARIOS' &&
-          session.user.role !== 'CRM' && (
+          session.user.role !== 'CRM' &&
+          session.user.role !== 'MASTER' && (
             <VentasPorUsuarioView
               token={session.accessToken}
               user={session.user}
@@ -366,7 +381,7 @@ export const App: React.FC = () => {
           )}
 
         {activeScreen === 'PRODUCTOS' &&
-          (session.user.role === 'ADMIN' || session.user.role === 'MASTER') && (
+          session.user.role === 'ADMIN' && (
             <ProductosView
               token={session.accessToken}
               onProductUpdated={() => syncCatalog(session.accessToken)}
@@ -374,8 +389,7 @@ export const App: React.FC = () => {
           )}
 
         {activeScreen === 'NUEVA_VENTA' &&
-          (session.user.role === 'CASHIER' ||
-            session.user.role === 'MASTER') && (
+          session.user.role === 'CASHIER' && (
           <NuevaVentaView
             token={session.accessToken}
             user={session.user}
@@ -396,19 +410,21 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeScreen === 'APERTURA_CAJA' && session.user.role !== 'CRM' && (
-          <TesoreriaView
-            token={session.accessToken}
-            user={session.user}
-            activeTab={tesoreriaTab}
-            onChangeTab={setTesoreriaTab}
-            registers={registers}
-            operations={operations}
-            onOpenRegister={handleOpenRegister}
-            onCloseRegister={handleCloseRegister}
-            onRegisterOperation={handleRegisterOperation}
-          />
-        )}
+        {activeScreen === 'APERTURA_CAJA' &&
+          session.user.role !== 'CRM' &&
+          session.user.role !== 'MASTER' && (
+            <TesoreriaView
+              token={session.accessToken}
+              user={session.user}
+              activeTab={tesoreriaTab}
+              onChangeTab={setTesoreriaTab}
+              registers={registers}
+              operations={operations}
+              onOpenRegister={handleOpenRegister}
+              onCloseRegister={handleCloseRegister}
+              onRegisterOperation={handleRegisterOperation}
+            />
+          )}
 
         {activeScreen === 'MASTER_CONTROL' &&
           session.user.role === 'MASTER' && (

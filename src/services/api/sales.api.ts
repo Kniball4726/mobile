@@ -96,4 +96,48 @@ export const SalesApi = {
       token,
     );
   },
+
+  createMercadoPagoQr(
+    token: string,
+    payload: {
+      totalPesos: number;
+      title?: string;
+      externalReference: string;
+    },
+  ): Promise<{
+    isAvailable: boolean;
+    status: 'pending' | 'approved' | 'rejected' | 'disabled';
+    externalReference: string;
+    initPoint?: string;
+    qrData?: string;
+    qrImageUrl?: string;
+    message?: string;
+  }> {
+    return request(
+      '/sales/mercadopago/create-qr-order',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  checkMercadoPagoStatus(
+    token: string,
+    externalReference: string,
+  ): Promise<{
+    isPaid: boolean;
+    status: string;
+    paymentId?: string;
+    paymentMethodId?: string;
+    amount?: number;
+    message?: string;
+  }> {
+    return request(
+      `/sales/mercadopago/order-status/${encodeURIComponent(externalReference)}`,
+      { method: 'GET' },
+      token,
+    );
+  },
 };

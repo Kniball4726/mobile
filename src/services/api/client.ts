@@ -35,7 +35,15 @@ export async function request<T>(
       data?.error?.message ||
       data?.message ||
       `Error HTTP ${res.status} al comunicarse con el servidor`;
-    throw new Error(errMessage);
+    const error = new Error(errMessage) as Error & {
+      status?: number;
+      code?: string;
+      details?: Record<string, any>;
+    };
+    error.status = res.status;
+    error.code = data?.error?.code || data?.code;
+    error.details = data?.error?.details || data?.details;
+    throw error;
   }
 
   return data as T;

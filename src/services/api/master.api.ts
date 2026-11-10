@@ -2,6 +2,8 @@ import {
   ApiKeyRecord,
   AuditLogRecord,
   GlobalSystemSettings,
+  MaskedMercadoPagoSettings,
+  TestMpConnectionResult,
 } from '../../types/domain.types';
 import { request } from './client';
 
@@ -23,6 +25,50 @@ export const MasterApi = {
       {
         method: 'PATCH',
         body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  getMercadoPagoSettings(token: string): Promise<MaskedMercadoPagoSettings> {
+    return request<MaskedMercadoPagoSettings>(
+      '/master/integrations/mercadopago',
+      { method: 'GET' },
+      token,
+    );
+  },
+
+  updateMercadoPagoSettings(
+    token: string,
+    payload: {
+      isEnabled: boolean;
+      isSandbox: boolean;
+      publicKey?: string | null;
+      accessToken?: string | null;
+      webhookSecret?: string | null;
+      posId?: string | null;
+      userId?: string | null;
+    },
+  ): Promise<MaskedMercadoPagoSettings> {
+    return request<MaskedMercadoPagoSettings>(
+      '/master/integrations/mercadopago',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  testMercadoPagoConnection(
+    token: string,
+    accessTokenOverride?: string,
+  ): Promise<TestMpConnectionResult> {
+    return request<TestMpConnectionResult>(
+      '/master/integrations/mercadopago/test-connection',
+      {
+        method: 'POST',
+        body: JSON.stringify({ accessToken: accessTokenOverride }),
       },
       token,
     );

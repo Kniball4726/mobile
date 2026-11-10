@@ -10,16 +10,19 @@ import {
   ShieldAlert,
   Wifi,
   WifiOff,
+  RefreshCw,
   Tag,
   Users,
   Sun,
   Moon,
 } from 'lucide-react';
+import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { NavigationDrawer } from './NavigationDrawer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { UserMenuDropdown } from './UserMenuDropdown';
 
 export interface JustiTopbarProps {
+  token?: string;
   user: UserProfile;
   activeScreen: ActiveScreen;
   tesoreriaTab: TesoreriaTab;
@@ -31,6 +34,7 @@ export interface JustiTopbarProps {
 }
 
 export const JustiTopbar: React.FC<JustiTopbarProps> = ({
+  token,
   user,
   activeScreen,
   tesoreriaTab,
@@ -44,19 +48,8 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   const [openMenu, setOpenMenu] = useState<
     'VENTAS' | 'TESORERIA' | 'USER' | null
   >(null);
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const { isOnline, pendingCount, isSyncing, syncNow } = useNetworkStatus();
   const navRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -79,9 +72,10 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   }, []);
 
   const isCrmOnly = user.role === 'CRM';
-  const canSell = user.role === 'CASHIER' || user.role === 'MASTER';
-  const canOperateCash = user.role === 'CASHIER' || user.role === 'MASTER';
-  const isAdminOrMaster = user.role === 'ADMIN' || user.role === 'MASTER';
+  const isMaster = user.role === 'MASTER';
+  const canSell = user.role === 'CASHIER';
+  const canOperateCash = user.role === 'CASHIER';
+  const isAdmin = user.role === 'ADMIN';
 
   return (
     <>
@@ -139,7 +133,39 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 Inicio
               </button>
 
-              {isCrmOnly ? (
+              {isMaster ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenMenu(null);
+                      onNavigate('USUARIOS');
+                    }}
+                    className={`justi-nav-pill text-xs px-2.5 ${
+                      activeScreen === 'USUARIOS' ? 'justi-nav-pill-active' : ''
+                    }`}
+                  >
+                    <Users className="mr-1 h-3.5 w-3.5" />
+                    <span>Gestión de Usuarios</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenMenu(null);
+                      onNavigate('MASTER_CONTROL');
+                    }}
+                    className={`justi-nav-pill text-xs px-2.5 ${
+                      activeScreen === 'MASTER_CONTROL'
+                        ? 'justi-nav-pill-active'
+                        : ''
+                    }`}
+                  >
+                    <ShieldAlert className="mr-1 h-3.5 w-3.5 text-amber-300" />
+                    <span>Control Master</span>
+                  </button>
+                </>
+              ) : isCrmOnly ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -293,70 +319,77 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                       </div>
                     )}
                   </div>
+
+                  {isAdmin && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenMenu(null);
+                          onNavigate('PRODUCTOS');
+                        }}
+                        className={`justi-nav-pill text-xs px-2.5 ${
+                          activeScreen === 'PRODUCTOS'
+                            ? 'justi-nav-pill-active'
+                            : ''
+                        }`}
+                      >
+                        <Tag className="mr-1 h-3.5 w-3.5" />
+                        <span>Productos</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenMenu(null);
+                          onNavigate('USUARIOS');
+                        }}
+                        className={`justi-nav-pill text-xs px-2.5 ${
+                          activeScreen === 'USUARIOS'
+                            ? 'justi-nav-pill-active'
+                            : ''
+                        }`}
+                      >
+                        <Users className="mr-1 h-3.5 w-3.5" />
+                        <span>Operadores</span>
+                      </button>
+                    </>
+                  )}
                 </>
-              )}
-
-              {isAdminOrMaster && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenMenu(null);
-                      onNavigate('PRODUCTOS');
-                    }}
-                    className={`justi-nav-pill text-xs px-2.5 ${
-                      activeScreen === 'PRODUCTOS'
-                        ? 'justi-nav-pill-active'
-                        : ''
-                    }`}
-                  >
-                    <Tag className="mr-1 h-3.5 w-3.5" />
-                    <span>Productos</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenMenu(null);
-                      onNavigate('USUARIOS');
-                    }}
-                    className={`justi-nav-pill text-xs px-2.5 ${
-                      activeScreen === 'USUARIOS' ? 'justi-nav-pill-active' : ''
-                    }`}
-                  >
-                    <Users className="mr-1 h-3.5 w-3.5" />
-                    <span>Operadores</span>
-                  </button>
-                </>
-              )}
-
-              {user.role === 'MASTER' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onNavigate('MASTER_CONTROL');
-                  }}
-                  className={`justi-nav-pill text-xs px-2.5 ${
-                    activeScreen === 'MASTER_CONTROL'
-                      ? 'justi-nav-pill-active'
-                      : ''
-                  }`}
-                >
-                  <ShieldAlert className="mr-1 h-3.5 w-3.5 text-amber-600" />
-                  <span>Master</span>
-                </button>
               )}
             </div>
           </div>
 
-          {/* Derecha: Estado Online/Offline + Sucursal + Botón Dark Mode + Perfil */}
+          {/* Derecha: Estado Online/Offline + Ventas Pendientes + Sucursal + Botón Dark Mode + Perfil */}
           <div className="flex items-center gap-1.5 shrink-0">
+            {pendingCount > 0 && (
+              <button
+                type="button"
+                onClick={() => token && syncNow(token)}
+                disabled={isSyncing || !isOnline}
+                title={
+                  isOnline
+                    ? `Sincronizar ${pendingCount} venta(s) offline con la nube`
+                    : `${pendingCount} venta(s) guardadas offline en el dispositivo (sin conexión)`
+                }
+                className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-bold shadow-sm transition active:scale-95 ${
+                  isOnline
+                    ? 'bg-amber-400 hover:bg-amber-300 text-amber-950 animate-pulse cursor-pointer'
+                    : 'bg-amber-200/90 text-amber-950 cursor-default'
+                }`}
+              >
+                <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>
+                  {pendingCount} {pendingCount === 1 ? 'offline' : 'offlines'}
+                </span>
+              </button>
+            )}
+
             <span
               className={`hidden sm:inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-bold ${
                 isOnline
                   ? 'bg-emerald-100/90 text-emerald-900'
-                  : 'bg-amber-100 text-amber-900'
+                  : 'bg-amber-100 text-amber-900 animate-pulse'
               }`}
             >
               {isOnline ? (

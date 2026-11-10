@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CameraBarcodeModal } from '../../components/CameraBarcodeModal';
 import { useBarcodeScanner } from '../../hooks/useBarcodeScanner';
+import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { CatalogApi, CrmApi, SalesApi } from '../../services/api.service';
+import {
+  generateOfflineFolio,
+  isNetworkError,
+  OfflineSyncService,
+} from '../../services/offline/offline-sync.service';
 import {
   CartItem,
   CategoryItem,
@@ -13,6 +19,8 @@ import { PosCartTable } from './components/PosCartTable';
 import { PosCustomerHeader } from './components/PosCustomerHeader';
 import { PosPaymentSection } from './components/PosPaymentSection';
 import { PosReceiptAlert } from './components/PosReceiptAlert';
+import { MercadoPagoQrModal } from './components/MercadoPagoQrModal';
+import { RefreshCw, WifiOff } from 'lucide-react';
 
 interface NuevaVentaViewProps {
   token: string;
@@ -81,6 +89,14 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   const [codeSearch, setCodeSearch] = useState('');
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
+  const {
+    isOnline,
+    pendingCount,
+    isSyncing,
+    syncStatusMessage,
+    syncNow,
+  } = useNetworkStatus();
+
   const assignedBranch = user.branch || 'LOCALES';
   const isBranchLocked = user.role !== 'ADMIN' && user.role !== 'MASTER';
 
@@ -102,7 +118,9 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     totalPesos: number;
     discountApplied: number;
     cardPlan?: string;
+    isOffline?: boolean;
   } | null>(null);
+  const [isMpModalOpen, setIsMpModalOpen] = useState(false);
 
   useEffect(() => {
     if (preselectedCustomer) {
@@ -149,8 +167,12 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       try {
         const res = await CrmApi.searchCustomers(token, customerSearch.trim());
         setCustomerResults(res);
+        if (res.length > 0) {
+          res.forEach((c) => OfflineSyncService.cacheRecentCustomer(c));
+        }
       } catch {
-        setCustomerResults([]);
+        const offlineMatches = OfflineSyncService.getCachedCustomers(customerSearch);
+        setCustomerResults(offlineMatches);
       }
     }, 220);
     return () => clearTimeout(timer);
@@ -400,7 +422,107 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     paymentLabel.toUpperCase().includes('DEBITO') ||
     paymentLabel.toUpperCase().includes('DÉBITO');
 
-  const handleCheckout = async () => {
+  const executeOfflineCheckout = (idempotencyKey: string, manualRef?: string) => {
+    const finalPesos = totals.finalTotalPesos;
+    const totalCents = Math.round(finalPesos * 100);
+    const discountApplied =
+      totals.discountPesos > 0
+        ? Math.round((totals.discountPesos / (totals.grossPesos || 1)) * 100)
+        : 0;
+
+    const offlineFolio = generateOfflineFolio(sucursal);
+    const refParts = [paymentLabel];
+    if (manualRef) {
+      refParts.push(manualRef);
+    }
+    if (isCardPayment) {
+      refParts.push(`Plan: ${selectedCardPlan}`);
+    }
+    if (selectedCustomer) {
+      refParts.push(`Cliente: ${selectedCustomer.fullName}`);
+    } else {
+      refParts.push(customerSearch || defaultCustomerLabel);
+    }
+    if (remitoNumber) {
+      refParts.push(`Remito: ${remitoNumber}`);
+    }
+
+    const payload = {
+      items: cart.map((item) => {
+        const basePrice =
+          typeof item.customPrice === 'number'
+            ? item.customPrice
+            : item.product.price;
+        const descPercent =
+          typeof item.discountPercent === 'number'
+            ? item.discountPercent
+            : generalDiscountPercent;
+        return {
+          productId: item.product._id,
+          quantity: item.quantity,
+          customPriceCents: Math.round(basePrice * 100),
+          discountPercentage: descPercent > 0 ? descPercent : undefined,
+        };
+      }),
+      customerId: selectedCustomer ? selectedCustomer._id : null,
+      applyCustomerDiscount: Boolean(
+        selectedCustomer &&
+          selectedCustomer.activeDiscount?.isAvailable &&
+          applyCrmDiscount,
+      ),
+      payments: [
+        {
+          method: selectedPayOption.backendMethod,
+          amountCents: totalCents,
+          reference: refParts.join(' | '),
+        },
+      ],
+    };
+
+    OfflineSyncService.enqueueSale({
+      idempotencyKey,
+      receiptNumber: offlineFolio,
+      payload,
+      summary: {
+        receiptNumber: offlineFolio,
+        totalPesos: finalPesos,
+        discountApplied,
+        cardPlan: isCardPayment ? selectedCardPlan : undefined,
+        itemsCount: cart.reduce((acc, i) => acc + i.quantity, 0),
+        customerLabel: selectedCustomer ? selectedCustomer.fullName : customerSearch,
+        paymentLabel,
+        branch: sucursal,
+      },
+    });
+
+    setLastReceipt({
+      receiptNumber: offlineFolio,
+      totalPesos: finalPesos,
+      discountApplied,
+      cardPlan: isCardPayment ? selectedCardPlan : undefined,
+      isOffline: true,
+    });
+
+    if (selectedCustomer && discountApplied > 0) {
+      setSelectedCustomer({
+        ...selectedCustomer,
+        activeDiscount: {
+          ...selectedCustomer.activeDiscount,
+          isAvailable: false,
+          consumedAt: new Date().toISOString(),
+          consumedInSaleNumber: offlineFolio,
+        },
+      });
+    }
+
+    setCart([]);
+    setGeneralObservations('');
+    setSelectedCustomer(null);
+    setCustomerSearch(defaultCustomerLabel);
+    onSaleCompleted(finalPesos);
+  };
+
+  const handleCheckout = async (manualRef?: string) => {
     setError(null);
     setLastReceipt(null);
 
@@ -416,12 +538,25 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const idempotencyKey = `justi-pos-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}`;
+    // Si la forma de pago es QR Mercado Pago y no se ha aprobado aún el modal
+    if (paymentLabel === 'QR mercado pago' && !manualRef) {
+      setIsMpModalOpen(true);
+      return;
+    }
 
+    setSubmitting(true);
+    const idempotencyKey = `justi-pos-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+
+    // Si no hay conexión en el dispositivo, guardar directamente offline
+    if (!isOnline) {
+      executeOfflineCheckout(idempotencyKey, manualRef);
+      setSubmitting(false);
+      return;
+    }
+
+    try {
       const preview = await SalesApi.previewSale(token, {
         items: cart.map((item) => {
           const basePrice =
@@ -448,6 +583,9 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       });
 
       const refParts = [paymentLabel];
+      if (manualRef) {
+        refParts.push(manualRef);
+      }
       if (isCardPayment) {
         refParts.push(`Plan: ${selectedCardPlan}`);
       }
@@ -498,6 +636,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         totalPesos: finalPesos,
         discountApplied: response.sale.discountPercentageApplied,
         cardPlan: isCardPayment ? selectedCardPlan : undefined,
+        isOffline: false,
       });
 
       if (selectedCustomer && response.sale.discountPercentageApplied > 0) {
@@ -518,11 +657,16 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       setCustomerSearch(defaultCustomerLabel);
       onSaleCompleted(finalPesos);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Error al procesar la venta en el servidor.',
-      );
+      if (isNetworkError(err)) {
+        // Fallback transparente al modo offline sin interrumpir al vendedor ni perder la venta
+        executeOfflineCheckout(idempotencyKey, manualRef);
+      } else {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Error al procesar la venta en el servidor.',
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -573,6 +717,44 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         )}
 
         {error && <div className="justi-alert-error">{error}</div>}
+
+        {syncStatusMessage && (
+          <div className="justi-alert-success flex items-center justify-between text-xs">
+            <span>{syncStatusMessage}</span>
+          </div>
+        )}
+
+        {(!isOnline || pendingCount > 0) && (
+          <div className="p-2.5 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-sm">
+            <div className="flex items-center gap-2">
+              <WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 animate-pulse" />
+              <span>
+                {!isOnline ? (
+                  <>
+                    <strong className="font-bold text-amber-800 dark:text-amber-300">Modo Offline Activo:</strong>{' '}
+                    Operando con catálogo local en caché. Las ventas se guardan con folio provisional y se sincronizarán al recuperar la red.
+                  </>
+                ) : (
+                  <>
+                    <strong className="font-bold text-amber-800 dark:text-amber-300">Conexión Restablecida:</strong>{' '}
+                    Hay <strong>{pendingCount}</strong> venta(s) guardada(s) localmente pendientes de enviar a la nube.
+                  </>
+                )}
+              </span>
+            </div>
+            {isOnline && pendingCount > 0 && (
+              <button
+                type="button"
+                disabled={isSyncing}
+                onClick={() => syncNow(token)}
+                className="px-3 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95 disabled:opacity-50 shrink-0"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Sincronizando...' : `Sincronizar (${pendingCount})`}</span>
+              </button>
+            )}
+          </div>
+        )}
 
         <PosReceiptAlert lastReceipt={lastReceipt} />
 

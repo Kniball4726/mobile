@@ -145,6 +145,28 @@ export interface GlobalSystemSettings {
   };
 }
 
+export interface MaskedMercadoPagoSettings {
+  isEnabled: boolean;
+  isSandbox: boolean;
+  publicKey: string | null;
+  accessTokenMasked: string | null;
+  hasAccessToken: boolean;
+  hasWebhookSecret: boolean;
+  posId: string | null;
+  userId: string | null;
+  updatedAt: string | null;
+}
+
+export interface TestMpConnectionResult {
+  success: boolean;
+  status: 'ACTIVE' | 'ERROR';
+  collectorId: number;
+  nickname: string;
+  email: string;
+  siteId: string;
+  message: string;
+}
+
 export interface ApiKeyRecord {
   _id?: string;
   id?: string;

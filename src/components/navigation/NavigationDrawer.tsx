@@ -48,10 +48,11 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const isMaster = user.role === 'MASTER';
   const isCrmOnly = user.role === 'CRM';
-  const canSell = user.role === 'CASHIER' || user.role === 'MASTER';
-  const canOperateCash = user.role === 'CASHIER' || user.role === 'MASTER';
-  const isAdminOrMaster = user.role === 'ADMIN' || user.role === 'MASTER';
+  const canSell = user.role === 'CASHIER';
+  const canOperateCash = user.role === 'CASHIER';
+  const isAdmin = user.role === 'ADMIN';
 
   const handleNavigate = (screen: ActiveScreen, tab?: TesoreriaTab) => {
     onClose();
@@ -142,190 +143,215 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               </div>
             </div>
 
-            {/* 2. Módulo de Ventas & Cobros */}
-            {!isCrmOnly && (
-              <div>
-                <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Ventas & Facturación
-                </span>
-                <div className="mt-1 space-y-0.5">
-                  {canSell && (
+            {isMaster ? (
+              <>
+                {/* Módulo Gestión de Usuarios */}
+                <div>
+                  <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Gestión de Usuarios
+                  </span>
+                  <div className="mt-1 space-y-0.5">
                     <button
                       type="button"
-                      onClick={() => handleNavigate('NUEVA_VENTA')}
+                      onClick={() => handleNavigate('USUARIOS')}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                        activeScreen === 'NUEVA_VENTA'
+                        activeScreen === 'USUARIOS'
                           ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
-                      <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>Nueva Venta en POS</span>
+                      <UserCheck className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
+                      <span>Gestión de Usuarios</span>
                     </button>
-                  )}
+                  </div>
+                </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('VENTAS_USUARIOS')}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                      activeScreen === 'VENTAS_USUARIOS'
-                        ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <Receipt className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
-                    <span>
-                      {user.role === 'CASHIER'
-                        ? 'Mis Ventas Registradas'
-                        : 'Auditoría de Ventas por Usuario'}
+                {/* Módulo Control Master */}
+                <div>
+                  <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Control del Sistema
+                  </span>
+                  <div className="mt-1 space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleNavigate('MASTER_CONTROL')}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                        activeScreen === 'MASTER_CONTROL'
+                          ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      <span>Control Master (Kill-Switch / API)</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* 2. Módulo de Ventas & Cobros */}
+                {!isCrmOnly && (
+                  <div>
+                    <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                      Ventas & Facturación
                     </span>
-                  </button>
+                    <div className="mt-1 space-y-0.5">
+                      {canSell && (
+                        <button
+                          type="button"
+                          onClick={() => handleNavigate('NUEVA_VENTA')}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                            activeScreen === 'NUEVA_VENTA'
+                              ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                          <span>Nueva Venta en POS</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleNavigate('VENTAS_USUARIOS')}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                          activeScreen === 'VENTAS_USUARIOS'
+                            ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <Receipt className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
+                        <span>
+                          {user.role === 'CASHIER'
+                            ? 'Mis Ventas Registradas'
+                            : 'Auditoría de Ventas por Usuario'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Módulo Clientes & Fidelización */}
+                <div>
+                  <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Fidelización & Clientes
+                  </span>
+                  <div className="mt-1 space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleNavigate('CLIENTES')}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                        activeScreen === 'CLIENTES'
+                          ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span>Clientes CRM (Descuentos)</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* 3. Módulo Clientes & Fidelización */}
-            <div>
-              <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                Fidelización & Clientes
-              </span>
-              <div className="mt-1 space-y-0.5">
-                <button
-                  type="button"
-                  onClick={() => handleNavigate('CLIENTES')}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                    activeScreen === 'CLIENTES'
-                      ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span>Clientes CRM (Descuentos)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 4. Módulo Tesorería y Cajas */}
-            {!isCrmOnly && (
-              <div>
-                <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Tesorería & Cajas
-                </span>
-                <div className="mt-1 space-y-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('APERTURA_CAJA', 'CAJAS')}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                      activeScreen === 'APERTURA_CAJA'
-                        ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <Wallet className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
-                    <span>
-                      {canOperateCash
-                        ? 'Consulta de Cajas'
-                        : 'Auditoría de Cajas'}
+                {/* 4. Módulo Tesorería y Cajas */}
+                {!isCrmOnly && (
+                  <div>
+                    <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                      Tesorería & Cajas
                     </span>
-                  </button>
-
-                  {canOperateCash && (
-                    <>
+                    <div className="mt-1 space-y-0.5">
                       <button
                         type="button"
-                        onClick={() =>
-                          handleNavigate('APERTURA_CAJA', 'ABRIR_CAJA')
-                        }
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                        onClick={() => handleNavigate('APERTURA_CAJA', 'CAJAS')}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                          activeScreen === 'APERTURA_CAJA'
+                            ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
                       >
-                        <PlusCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Abrir Nueva Caja</span>
+                        <Wallet className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
+                        <span>
+                          {canOperateCash
+                            ? 'Consulta de Cajas'
+                            : 'Auditoría de Cajas'}
+                        </span>
+                      </button>
+
+                      {canOperateCash && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleNavigate('APERTURA_CAJA', 'ABRIR_CAJA')
+                            }
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                          >
+                            <PlusCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                            <span>Abrir Nueva Caja</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleNavigate('APERTURA_CAJA', 'OPERACION_CAJA')
+                            }
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                          >
+                            <ArrowRightLeft className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                            <span>Operación de Caja</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleNavigate('APERTURA_CAJA', 'NUEVO_GASTO')
+                            }
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                          >
+                            <FileText className="h-4 w-4 text-red-600 dark:text-red-400" />
+                            <span>Nuevo Gasto de Mostrador</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. Módulo Administración */}
+                {isAdmin && (
+                  <div>
+                    <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                      Administración Comercial
+                    </span>
+                    <div className="mt-1 space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => handleNavigate('PRODUCTOS')}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                          activeScreen === 'PRODUCTOS'
+                            ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <Tag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        <span>Catálogo y Precios</span>
                       </button>
 
                       <button
                         type="button"
-                        onClick={() =>
-                          handleNavigate('APERTURA_CAJA', 'OPERACION_CAJA')
-                        }
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                        onClick={() => handleNavigate('USUARIOS')}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
+                          activeScreen === 'USUARIOS'
+                            ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
                       >
-                        <ArrowRightLeft className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                        <span>Operación de Caja</span>
+                        <UserCheck className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
+                        <span>Operadores y Sucursales</span>
                       </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleNavigate('APERTURA_CAJA', 'NUEVO_GASTO')
-                        }
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
-                      >
-                        <FileText className="h-4 w-4 text-red-600 dark:text-red-400" />
-                        <span>Nuevo Gasto de Mostrador</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* 5. Módulo Administración */}
-            {isAdminOrMaster && (
-              <div>
-                <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Administración Comercial
-                </span>
-                <div className="mt-1 space-y-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('PRODUCTOS')}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                      activeScreen === 'PRODUCTOS'
-                        ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <Tag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    <span>Catálogo y Precios</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('USUARIOS')}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                      activeScreen === 'USUARIOS'
-                        ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <UserCheck className="h-4 w-4 text-[#1B5E91] dark:text-blue-400" />
-                    <span>Operadores y Sucursales</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 6. Módulo Master */}
-            {user.role === 'MASTER' && (
-              <div>
-                <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Control del Sistema
-                </span>
-                <div className="mt-1 space-y-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('MASTER_CONTROL')}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-semibold transition ${
-                      activeScreen === 'MASTER_CONTROL'
-                        ? 'bg-[#DCEAF7] dark:bg-slate-800 text-[#1B5E91] dark:text-blue-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
-                    <span>Control Master (Kill-Switch / API)</span>
-                  </button>
-                </div>
-              </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </nav>
 
