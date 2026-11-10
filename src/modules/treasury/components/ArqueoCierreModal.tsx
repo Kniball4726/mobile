@@ -317,7 +317,3 @@ export const ArqueoCierreModal: React.FC<ArqueoCierreModalProps> = ({
     </div>
   );
 };
-      </div>
-    </div>
-  );
-};

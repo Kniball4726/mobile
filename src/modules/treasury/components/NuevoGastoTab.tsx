@@ -46,10 +46,10 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
           </div>
         )}
 
-        <div className="w-full max-w-lg rounded border border-[#B8D4EC] bg-[#F5FAFF] p-3.5 sm:p-4 space-y-2.5 text-xs shadow-sm">
+        <div className="w-full max-w-lg rounded border border-[#B8D4EC] dark:border-slate-700 bg-[#F5FAFF] dark:bg-slate-800/90 p-3.5 sm:p-4 space-y-2.5 text-xs shadow-sm">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Fecha:
               </label>
               <input
@@ -60,7 +60,7 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Sucursal:
               </label>
               <select
@@ -69,7 +69,7 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
                 onChange={(e) =>
                   setSelectedBranch(e.target.value as BranchType)
                 }
-                className="justi-select w-full font-semibold disabled:bg-slate-200 disabled:text-slate-700 disabled:cursor-not-allowed"
+                className="justi-select w-full font-semibold disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-700 dark:disabled:text-slate-300 disabled:cursor-not-allowed"
               >
                 <option value="LOCALES">LOCALES</option>
                 <option value="CARRERAS">CARRERAS</option>
@@ -78,7 +78,7 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Caja *:
             </label>
             <select className="justi-select w-full sm:w-56">
@@ -89,13 +89,13 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
                   </option>
                 ))
               ) : (
-                <option value="">Ventas Sucursal (PASTEUR)</option>
+                <option value="">Ventas Sucursal</option>
               )}
             </select>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Importe $: *
             </label>
             <input
@@ -109,7 +109,7 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Categoría Gasto:
             </label>
             <select
@@ -125,7 +125,7 @@ export const NuevoGastoTab: React.FC<NuevoGastoTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700 pt-1">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300 pt-1">
               Detalle: *
             </label>
             <textarea

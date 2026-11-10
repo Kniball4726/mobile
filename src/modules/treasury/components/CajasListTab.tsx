@@ -67,12 +67,12 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
 
         <div className="justi-filter-bar flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-sm">
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 text-[11px]">
-            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1">
+            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-slate-700 dark:text-slate-300">
               <span>Usuario:</span>
               <select
                 value={filterUser}
                 onChange={(e) => setFilterUser(e.target.value)}
-                className="rounded border border-slate-400 bg-white px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800"
+                className="rounded border border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-800 px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800 dark:text-slate-100 outline-none"
               >
                 <option value="(todos)">(todos)</option>
                 {availableUsers.map((u) => (
@@ -82,7 +82,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                 ))}
               </select>
             </label>
-            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1">
+            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-slate-700 dark:text-slate-300">
               <span>Sucursal:</span>
               <select
                 value={effectiveBranch}
@@ -90,30 +90,30 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                 onChange={(e) =>
                   setSelectedBranch(e.target.value as BranchType)
                 }
-                className="rounded border border-slate-400 bg-white px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] font-bold text-slate-800 disabled:bg-slate-200 disabled:cursor-not-allowed"
+                className="rounded border border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-800 px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] font-bold text-slate-800 dark:text-slate-100 disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:cursor-not-allowed outline-none"
               >
                 <option value="LOCALES">LOCALES</option>
                 <option value="CARRERAS">CARRERAS</option>
               </select>
             </label>
-            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1">
+            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-slate-700 dark:text-slate-300">
               <span>Tipo Caja:</span>
               <select
                 value={filterBoxType}
                 onChange={(e) => setFilterBoxType(e.target.value)}
-                className="rounded border border-slate-400 bg-white px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800"
+                className="rounded border border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-800 px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800 dark:text-slate-100 outline-none"
               >
                 <option value="(todos)">(todos)</option>
                 <option value="Ventas Sucursal">Ventas Sucursal</option>
                 <option value="Caja Consolidada">Caja Consolidada</option>
               </select>
             </label>
-            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1">
+            <label className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-slate-700 dark:text-slate-300">
               <span>Estado:</span>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="rounded border border-slate-400 bg-white px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800"
+                className="rounded border border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-800 px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-slate-800 dark:text-slate-100 outline-none"
               >
                 <option value="(todos)">(todos)</option>
                 <option value="Abierta">Abierta</option>
@@ -136,46 +136,48 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
         {/* Vista Móvil (< md): Tarjetas de Cajas */}
         <div className="md:hidden space-y-2">
           {filteredRegisters.length === 0 ? (
-            <div className="rounded border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500">
+            <div className="rounded border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500 dark:text-slate-400">
               No hay cajas que coincidan con los filtros seleccionados.
             </div>
           ) : (
             filteredRegisters.map((reg, i) => (
               <div
                 key={reg.id}
-                className={`rounded border border-[#80AED8] p-3 text-xs shadow-sm ${
-                  i % 2 === 0 ? 'bg-[#E5E5F7]' : 'bg-[#F4F4FB]'
+                className={`rounded border border-[#80AED8] dark:border-slate-700 p-3 text-xs shadow-sm transition-colors ${
+                  i % 2 === 0
+                    ? 'bg-[#E5E5F7] dark:bg-slate-800/90'
+                    : 'bg-[#F4F4FB] dark:bg-slate-800/60'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                       Sucursal {reg.branch}
                     </span>
-                    <h3 className="text-sm font-bold text-[#1B5E91]">
+                    <h3 className="text-sm font-bold text-[#1B5E91] dark:text-sky-400">
                       {reg.boxType}
                     </h3>
-                    <p className="text-xs text-slate-700">
+                    <p className="text-xs text-slate-700 dark:text-slate-300">
                       Usuario: {reg.userFullName}
                     </p>
                   </div>
                   <span
                     className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                       reg.status === 'ABIERTA'
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-400'
-                        : 'bg-slate-200 text-slate-700'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700'
+                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     {reg.status}
                   </span>
                 </div>
 
-                <div className="mt-2 flex items-center justify-between border-t border-slate-300/80 pt-2">
+                <div className="mt-2 flex items-center justify-between border-t border-slate-300/80 dark:border-slate-700 pt-2">
                   <div>
-                    <span className="block text-[10px] text-slate-500">
+                    <span className="block text-[10px] text-slate-500 dark:text-slate-400">
                       Abierta: {reg.openedAt}
                     </span>
-                    <span className="text-sm font-extrabold text-slate-900">
+                    <span className="text-sm font-extrabold text-slate-900 dark:text-white">
                       Saldo: ${reg.currentBalance.toLocaleString('es-AR')}
                     </span>
                   </div>
@@ -193,7 +195,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                       <button
                         type="button"
                         onClick={() => onViewSummaryModal(reg)}
-                        className="rounded border border-[#80AED8] bg-white text-[#1B5E91] hover:bg-[#DCEAF7] py-1 px-2.5 font-bold text-xs"
+                        className="rounded border border-[#80AED8] dark:border-slate-600 bg-white dark:bg-slate-700 text-[#1B5E91] dark:text-sky-300 hover:bg-[#DCEAF7] dark:hover:bg-slate-600 py-1 px-2.5 font-bold text-xs transition-colors"
                       >
                         Ver Arqueo
                       </button>
@@ -206,14 +208,14 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
         </div>
 
         {/* Vista Desktop (>= md): Tabla */}
-        <div className="hidden md:block border border-[#80AED8] bg-white overflow-x-auto">
-          <div className="bg-[#4E8EC2] px-3 py-1.5 text-white flex items-center justify-between text-xs">
+        <div className="hidden md:block border border-[#80AED8] dark:border-slate-700 bg-white dark:bg-slate-900 overflow-x-auto rounded-sm shadow-sm">
+          <div className="bg-[#4E8EC2] dark:bg-slate-800 px-3 py-1.5 text-white flex items-center justify-between text-xs border-b border-transparent dark:border-slate-700">
             <span>{filteredRegisters.length} registro(s) encontrado(s)</span>
             <span>Sucursal {effectiveBranch}</span>
           </div>
           <table className="w-full border-collapse text-xs text-left">
             <thead>
-              <tr className="bg-[#DCEAF7] text-[#1B5E91] border-b border-[#80AED8]">
+              <tr className="bg-[#DCEAF7] dark:bg-slate-800/90 text-[#1B5E91] dark:text-sky-300 border-b border-[#80AED8] dark:border-slate-700">
                 <th className="py-2 px-2">Usuario</th>
                 <th className="py-2 px-2">Sucursal</th>
                 <th className="py-2 px-2">Tipo Caja</th>
@@ -227,7 +229,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
             <tbody>
               {filteredRegisters.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-6 text-center text-slate-500">
+                  <td colSpan={8} className="py-6 text-center text-slate-500 dark:text-slate-400">
                     No hay cajas registradas para los filtros aplicados.
                   </td>
                 </tr>
@@ -235,7 +237,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                 filteredRegisters.map((reg, i) => (
                   <tr
                     key={reg.id}
-                    className={`border-b border-slate-200 ${
+                    className={`border-b border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 ${
                       i % 2 === 0
                         ? 'justi-table-row-even'
                         : 'justi-table-row-odd'
@@ -245,7 +247,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                       {reg.userFullName}
                     </td>
                     <td className="py-2 px-2">{reg.branch}</td>
-                    <td className="py-2 px-2 font-bold text-[#1B5E91]">
+                    <td className="py-2 px-2 font-bold text-[#1B5E91] dark:text-sky-400">
                       {reg.boxType}
                     </td>
                     <td className="py-2 px-2">{reg.openedAt}</td>
@@ -254,14 +256,14 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                       <span
                         className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                           reg.status === 'ABIERTA'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-400'
-                            : 'bg-slate-200 text-slate-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700'
+                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                         }`}
                       >
                         {reg.status}
                       </span>
                     </td>
-                    <td className="py-2 px-2 text-right font-mono font-bold">
+                    <td className="py-2 px-2 text-right font-mono font-bold text-slate-900 dark:text-white">
                       ${reg.currentBalance.toLocaleString('es-AR')}
                     </td>
                     <td className="py-2 px-2 text-center">
@@ -279,7 +281,7 @@ export const CajasListTab: React.FC<CajasListTabProps> = ({
                           <button
                             type="button"
                             onClick={() => onViewSummaryModal(reg)}
-                            className="rounded border border-[#80AED8] bg-white text-[#1B5E91] hover:bg-[#DCEAF7] text-[11px] py-0.5 px-2 font-semibold"
+                            className="rounded border border-[#80AED8] dark:border-slate-600 bg-white dark:bg-slate-800 text-[#1B5E91] dark:text-sky-300 hover:bg-[#DCEAF7] dark:hover:bg-slate-700 text-[11px] py-0.5 px-2 font-semibold transition-colors"
                           >
                             Ver Arqueo
                           </button>

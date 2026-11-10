@@ -34,9 +34,9 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
         onSubmit={onSubmit}
         className="p-3 sm:p-4 flex-1 flex flex-col items-center space-y-4"
       >
-        <div className="w-full max-w-xl rounded border border-[#B8D4EC] bg-[#F5FAFF] p-3.5 sm:p-4 space-y-3 text-xs shadow-sm">
+        <div className="w-full max-w-xl rounded border border-[#B8D4EC] dark:border-slate-700 bg-[#F5FAFF] dark:bg-slate-800/90 p-3.5 sm:p-4 space-y-3 text-xs shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Usuario:
             </label>
             <select className="justi-select w-full sm:w-56" defaultValue={user.fullName}>
@@ -46,7 +46,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Sucursal:
             </label>
             <select
@@ -55,7 +55,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
               onChange={(e) =>
                 setSelectedBranch(e.target.value as BranchType)
               }
-              className="justi-select w-full sm:w-36 font-semibold disabled:bg-slate-200 disabled:text-slate-700 disabled:cursor-not-allowed"
+              className="justi-select w-full sm:w-36 font-semibold disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-700 dark:disabled:text-slate-300 disabled:cursor-not-allowed"
             >
               <option value="LOCALES">LOCALES</option>
               <option value="CARRERAS">CARRERAS</option>
@@ -63,7 +63,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300">
               Tipo de Caja*:
             </label>
             <select
@@ -73,7 +73,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
                   e.target.value as 'Ventas Sucursal' | 'Caja Consolidada',
                 )
               }
-              className="justi-select w-full sm:w-56 font-bold text-[#1B5E91]"
+              className="justi-select w-full sm:w-56 font-bold text-[#1B5E91] dark:text-sky-300"
             >
               <option value="Ventas Sucursal">Ventas Sucursal</option>
               <option value="Caja Consolidada">Caja Consolidada</option>
@@ -81,7 +81,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-            <label className="sm:w-28 font-semibold text-slate-700 pt-1">
+            <label className="sm:w-28 font-semibold text-slate-700 dark:text-slate-300 pt-1">
               Observaciones:
             </label>
             <textarea
@@ -93,7 +93,7 @@ export const AbrirCajaTab: React.FC<AbrirCajaTabProps> = ({
           </div>
         </div>
 
-        <div className="w-full max-w-5xl rounded bg-[#5492C6] px-3.5 py-2.5 text-center text-xs font-bold text-white shadow-sm leading-relaxed">
+        <div className="w-full max-w-5xl rounded bg-[#5492C6] dark:bg-slate-800 border border-transparent dark:border-slate-700 px-3.5 py-2.5 text-center text-xs font-bold text-white dark:text-slate-200 shadow-sm leading-relaxed">
           Atención: Al abrir una caja consolidada no pueden haber cajas
           abiertas de ningún tipo para la sucursal. Además, luego de abrir
           una caja de este tipo se incluirán como saldos iniciales los

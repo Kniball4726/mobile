@@ -36,12 +36,12 @@ export const OperacionCajaTab: React.FC<OperacionCajaTabProps> = ({
           </div>
         )}
 
-        <div className="w-full max-w-md rounded border border-[#B8D4EC] bg-[#F5FAFF] p-3.5 sm:p-4 space-y-3 text-xs shadow-sm">
+        <div className="w-full max-w-md rounded border border-[#B8D4EC] dark:border-slate-700 bg-[#F5FAFF] dark:bg-slate-800/90 p-3.5 sm:p-4 space-y-3 text-xs shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">
               Seleccione el Tipo de Operación:
             </span>
-            <div className="space-y-2">
+            <div className="space-y-2 text-slate-800 dark:text-slate-200">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
@@ -72,9 +72,9 @@ export const OperacionCajaTab: React.FC<OperacionCajaTabProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-slate-200 space-y-2.5">
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
-              <label className="font-semibold text-slate-700">
+              <label className="font-semibold text-slate-700 dark:text-slate-300">
                 Importe $: *
               </label>
               <input
@@ -88,7 +88,7 @@ export const OperacionCajaTab: React.FC<OperacionCajaTabProps> = ({
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Detalle / Observación:
               </label>
               <input
