@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { SalesApi, UsersApi } from '../../services/api.service';
 import { SaleRecord, UserProfile, UserRecord } from '../../types/domain.types';
+import { JustiFooter } from '../../components/JustiFooter';
 import {
   FileSpreadsheet,
   RefreshCw,
@@ -415,6 +416,8 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
             </tbody>
           </table>
         </div>
+
+        <JustiFooter className="mt-8" />
       </div>
     </div>
   );

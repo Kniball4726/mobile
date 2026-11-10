@@ -6,6 +6,7 @@ import {
   UpdateProductInput,
 } from '../../types/domain.types';
 import { CatalogApi } from '../../services/api.service';
+import { JustiFooter } from '../../components/JustiFooter';
 import {
   DollarSign,
   Edit2,
@@ -624,6 +625,8 @@ export const ProductosView: React.FC<ProductosViewProps> = ({
             </tbody>
           </table>
         </div>
+
+        <JustiFooter className="mt-8" />
       </div>
 
       {/* MODAL 1: MODIFICACIÓN RÁPIDA DE PRECIO */}

@@ -14,6 +14,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { CrmReportModal } from './CrmReportModal';
+import { JustiFooter } from '../../components/JustiFooter';
 
 interface ClientesViewProps {
   token: string;
@@ -495,6 +496,8 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
             </span>
           </div>
         </div>
+
+        <JustiFooter className="mt-8" />
       </div>
 
       <CrmReportModal

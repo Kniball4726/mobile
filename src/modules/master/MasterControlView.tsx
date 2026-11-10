@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { MasterApi } from '../../services/api.service';
+import { JustiFooter } from '../../components/JustiFooter';
 import {
   ApiKeyRecord,
   AuditLogRecord,
@@ -421,6 +422,8 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
             </tbody>
           </table>
         </div>
+
+        <JustiFooter className="mt-8" />
       </div>
     </div>
   );

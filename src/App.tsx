@@ -283,7 +283,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#E8F2FC]">
+    <div className="min-h-screen w-full flex flex-col bg-[#E8F2FC] dark:bg-slate-900 transition-colors duration-200">
       <JustiTopbar
         user={session.user}
         activeScreen={activeScreen}

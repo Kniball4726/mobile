@@ -371,7 +371,7 @@ html.dark body {
   color: #6EE7B7;
 }
 
-/* Modificadores globales para transicionar fondos y bordes en Dark Mode */
+/* Modificadores globales para transicionar fondos, tarjetas y bordes en Dark Mode */
 .dark .bg-\[\#E8F2FC\],
 .dark .bg-\[\#F7FBFF\],
 .dark .bg-\[\#E6F0FA\] {
@@ -380,12 +380,107 @@ html.dark body {
 
 .dark .bg-\[\#DCEAF7\],
 .dark .bg-\[\#E8ECF8\],
-.dark .bg-\[\#F5FAFF\] {
+.dark .bg-\[\#F5FAFF\],
+.dark .bg-\[\#F4F9FE\],
+.dark .bg-\[\#E5E5F7\],
+.dark .bg-\[\#F4F4FB\],
+.dark .bg-\[\#D3E7F8\] {
   background-color: #1E293B !important;
 }
 
 .dark .border-\[\#80AED8\],
 .dark .border-\[\#9CC2E5\],
-.dark .border-\[\#B8D4EC\] {
+.dark .border-\[\#B8D4EC\],
+.dark .border-\[\#C2DAEE\],
+.dark .border-\[\#C6DDF2\],
+.dark .border-slate-300,
+.dark .border-slate-200 {
   border-color: #334155 !important;
+}
+
+/* Tarjetas y Contenedores blancos que deben ser oscuros en Dark Mode */
+.dark .bg-white:not(.keep-white) {
+  background-color: #1E293B !important;
+  color: #F1F5F9;
+}
+
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/60 {
+  background-color: rgba(30, 41, 59, 0.85) !important;
+  color: #F1F5F9;
+}
+
+.dark .bg-slate-200 {
+  background-color: #334155 !important;
+  color: #F1F5F9 !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1E293B !important;
+  color: #E2E8F0 !important;
+}
+
+/* Gradientes de tarjetas y botones (HomeView y AdminDashboardView) */
+.dark .from-\[\#DCECFB\] {
+  --tw-gradient-from: #1E293B var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(30 41 59 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.dark .to-\[\#C7E0F8\] {
+  --tw-gradient-to: #0F172A var(--tw-gradient-to-position) !important;
+}
+
+.dark .hover\:from-\[\#CBE3FA\]:hover {
+  --tw-gradient-from: #334155 var(--tw-gradient-from-position) !important;
+}
+
+.dark .hover\:to-\[\#B4D6F5\]:hover {
+  --tw-gradient-to: #1E293B var(--tw-gradient-to-position) !important;
+}
+
+/* Textos oscuros que deben ser claros en Dark Mode */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+.dark .text-\[\#1B5E91\],
+.dark .text-\[\#1B5688\] {
+  color: #60A5FA !important;
+}
+
+/* Badges y etiquetas */
+.dark .bg-emerald-100 {
+  background-color: #064E3B !important;
+  color: #6EE7B7 !important;
+  border-color: #065F46 !important;
+}
+
+.dark .text-emerald-800,
+.dark .text-emerald-900 {
+  color: #34D399 !important;
+}
+
+.dark .bg-amber-50\/70,
+.dark .bg-amber-50 {
+  background-color: rgba(69, 26, 3, 0.4) !important;
+  border-color: #78350F !important;
+}
+
+.dark .text-amber-800,
+.dark .text-amber-900 {
+  color: #FBBF24 !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(69, 10, 10, 0.4) !important;
+  border-color: #7F1D1D !important;
 }

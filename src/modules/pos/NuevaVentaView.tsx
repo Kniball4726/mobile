@@ -385,24 +385,24 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         )}
 
         {/* Cabecera del Comprobante: 100% Responsive en Móvil y Escritorio */}
-        <div className="rounded border border-slate-300 bg-[#F4F9FE] p-2.5 sm:p-3">
+        <div className="rounded border border-slate-300 dark:border-slate-700 bg-[#F4F9FE] dark:bg-slate-800/90 p-2.5 sm:p-3 shadow-sm transition-colors">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
             {/* Columna Izquierda: Fecha, Cliente, Vendedor */}
             <div className="lg:col-span-5 space-y-2.5 text-xs">
               <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
                 <div>
-                  <label className="block sm:inline sm:w-20 font-semibold text-slate-700 mb-0.5 sm:mb-0">
+                  <label className="block sm:inline sm:w-20 font-semibold text-slate-700 dark:text-slate-200 mb-0.5 sm:mb-0">
                     Fecha:
                   </label>
                   <input
                     type="text"
                     readOnly
                     value={todayFormatted}
-                    className="justi-input w-full sm:w-28 bg-white"
+                    className="justi-input w-full sm:w-28 bg-white dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
                 <div className="sm:hidden flex items-end justify-end">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 bg-white text-lg font-extrabold text-slate-900">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-lg font-extrabold text-slate-900 dark:text-slate-100">
                     X
                   </span>
                 </div>
@@ -410,7 +410,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
               {/* Buscador de Cliente CRM + Botón Agregar Cliente */}
               <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center gap-2 relative">
-                <label className="block sm:w-20 font-semibold text-slate-700">
+                <label className="block sm:w-20 font-semibold text-slate-700 dark:text-slate-200">
                   Cliente:
                 </label>
                 <div className="flex flex-col sm:flex-row flex-1 gap-1.5">
@@ -429,7 +429,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                     />
 
                     {showCustomerDropdown && customerResults.length > 0 && (
-                      <div className="absolute left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded border border-[#4E8EC2] bg-white shadow-xl z-30">
+                      <div className="absolute left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded border border-[#4E8EC2] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl z-30">
                         {customerResults.map((c) => (
                           <button
                             key={c._id}
@@ -440,23 +440,23 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                               setShowCustomerDropdown(false);
                               setApplyCrmDiscount(true);
                             }}
-                            className="flex w-full items-center justify-between border-b border-slate-100 px-3 py-2.5 text-left text-xs hover:bg-[#E8F2FC]"
+                            className="flex w-full items-center justify-between border-b border-slate-100 dark:border-slate-700 px-3 py-2.5 text-left text-xs hover:bg-[#E8F2FC] dark:hover:bg-slate-700"
                           >
                             <div className="min-w-0 pr-2">
-                              <p className="font-bold text-slate-800 truncate">
+                              <p className="font-bold text-slate-800 dark:text-slate-100 truncate">
                                 {c.fullName}
                               </p>
-                              <p className="text-[11px] text-slate-500 truncate">
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                                 {c.email}
                               </p>
                             </div>
                             {c.activeDiscount?.isAvailable &&
                             c.activeDiscount.percentage > 0 ? (
-                              <span className="shrink-0 rounded bg-emerald-100 border border-emerald-400 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                              <span className="shrink-0 rounded bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 dark:border-emerald-700 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
                                 {c.activeDiscount.percentage}% DTO CRM
                               </span>
                             ) : (
-                              <span className="shrink-0 text-[10px] text-slate-400">
+                              <span className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">
                                 0% Dto
                               </span>
                             )}
@@ -479,18 +479,18 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
               {/* Badge de Estado de Descuento CRM de Un Solo Uso */}
               {selectedCustomer && (
-                <div className="sm:ml-20 rounded border border-[#9CC2E5] bg-[#DCEAF7] px-2.5 py-2 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                <div className="sm:ml-20 rounded border border-[#9CC2E5] dark:border-slate-700 bg-[#DCEAF7] dark:bg-slate-800/90 px-2.5 py-2 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                   <div className="truncate">
-                    <span className="font-bold text-[#1B5E91]">
+                    <span className="font-bold text-[#1B5E91] dark:text-sky-300">
                       Cliente CRM: {selectedCustomer.fullName}
                     </span>{' '}
-                    <span className="text-slate-600">
+                    <span className="text-slate-600 dark:text-slate-400">
                       ({selectedCustomer.email})
                     </span>
                   </div>
                   {selectedCustomer.activeDiscount?.isAvailable &&
                   selectedCustomer.activeDiscount.percentage > 0 ? (
-                    <label className="inline-flex items-center gap-1.5 font-bold text-emerald-800 cursor-pointer">
+                    <label className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={applyCrmDiscount}
@@ -501,7 +501,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       Único
                     </label>
                   ) : (
-                    <span className="text-amber-800 font-semibold">
+                    <span className="text-amber-800 dark:text-amber-400 font-semibold">
                       Sin descuento activo{' '}
                       {selectedCustomer.activeDiscount?.consumedInSaleNumber
                         ? `(Ya usado en ${selectedCustomer.activeDiscount.consumedInSaleNumber})`
@@ -512,7 +512,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               )}
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <label className="sm:w-20 font-semibold text-slate-700">
+                <label className="sm:w-20 font-semibold text-slate-700 dark:text-slate-200">
                   Vendedor:
                 </label>
                 <select className="justi-select w-full sm:w-52">
@@ -525,7 +525,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
             {/* Columna Central: Letra "X" en Desktop */}
             <div className="hidden lg:flex lg:col-span-2 items-center justify-center">
-              <span className="text-3xl font-bold text-slate-900 select-none">
+              <span className="text-3xl font-bold text-slate-900 dark:text-slate-100 select-none">
                 X
               </span>
             </div>
@@ -533,13 +533,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
             {/* Columna Derecha: Comprobante, Sucursal, Nº Remito */}
             <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-2 text-xs">
               <div className="col-span-2 sm:col-span-1 flex flex-col lg:flex-row lg:items-center lg:justify-end gap-1 lg:gap-2">
-                <label className="lg:w-24 font-semibold text-slate-700">
+                <label className="lg:w-24 font-semibold text-slate-700 dark:text-slate-200">
                   Comprobante:
                 </label>
                 <select
                   value={comprobante}
                   onChange={(e) => setComprobante(e.target.value)}
-                  className="justi-select w-full lg:w-48 text-slate-700"
+                  className="justi-select w-full lg:w-48 text-slate-700 dark:text-slate-200"
                 >
                   <option>Nota de Venta</option>
                   <option>Factura B</option>
@@ -548,7 +548,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </div>
 
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-1 lg:gap-2">
-                <label className="lg:w-24 font-semibold text-slate-700">
+                <label className="lg:w-24 font-semibold text-slate-700 dark:text-slate-200">
                   Sucursal:
                 </label>
                 <select
@@ -560,7 +560,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       ? 'Sucursal asignada por el Administrador (bloqueada)'
                       : 'Seleccionar sucursal'
                   }
-                  className="justi-select w-full lg:w-48 font-semibold disabled:bg-slate-200 disabled:text-slate-700 disabled:cursor-not-allowed"
+                  className="justi-select w-full lg:w-48 font-semibold disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-700 dark:disabled:text-slate-400 disabled:cursor-not-allowed"
                 >
                   <option value="LOCALES">LOCALES</option>
                   <option value="CARRERAS">CARRERAS</option>
@@ -568,7 +568,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </div>
 
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-1 lg:gap-2">
-                <label className="lg:w-24 font-semibold text-slate-700">
+                <label className="lg:w-24 font-semibold text-slate-700 dark:text-slate-200">
                   Nº Remito:
                 </label>
                 <input

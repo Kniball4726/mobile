@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { UsersApi } from '../../services/api.service';
 import { BranchType, UserRecord, UserRole } from '../../types/domain.types';
 import { Building2, UserPlus, RefreshCw, Lock } from 'lucide-react';
+import { JustiFooter } from '../../components/JustiFooter';
 
 interface UsuariosViewProps {
   token: string;
@@ -293,6 +294,8 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
             </tbody>
           </table>
         </div>
+
+        <JustiFooter className="mt-8" />
       </div>
     </div>
   );

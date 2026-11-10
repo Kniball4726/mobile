@@ -6,6 +6,7 @@ import {
   TesoreriaTab,
   UserProfile,
 } from '../../types/domain.types';
+import { JustiFooter } from '../../components/JustiFooter';
 
 interface TesoreriaViewProps {
   user: UserProfile;
@@ -678,6 +679,8 @@ export const TesoreriaView: React.FC<TesoreriaViewProps> = ({
           </form>
         </>
       )}
+
+      <JustiFooter className="mt-8" />
     </div>
   );
 };
