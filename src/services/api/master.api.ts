@@ -2,7 +2,9 @@ import {
   ApiKeyRecord,
   AuditLogRecord,
   GlobalSystemSettings,
+  MaskedAfipSettings,
   MaskedMercadoPagoSettings,
+  TestAfipConnectionResult,
   TestMpConnectionResult,
 } from '../../types/domain.types';
 import { request } from './client';
@@ -69,6 +71,54 @@ export const MasterApi = {
       {
         method: 'POST',
         body: JSON.stringify({ accessToken: accessTokenOverride }),
+      },
+      token,
+    );
+  },
+
+  getAfipSettings(token: string): Promise<MaskedAfipSettings> {
+    return request<MaskedAfipSettings>(
+      '/master/integrations/afip',
+      { method: 'GET' },
+      token,
+    );
+  },
+
+  updateAfipSettings(
+    token: string,
+    payload: {
+      isEnabled: boolean;
+      isProduction: boolean;
+      cuit?: string | null;
+      puntoVenta?: number | null;
+      cert?: string | null;
+      privateKey?: string | null;
+      defaultConcepto?: number;
+      defaultCbteTipo?: number;
+    },
+  ): Promise<MaskedAfipSettings> {
+    return request<MaskedAfipSettings>(
+      '/master/integrations/afip',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  },
+
+  testAfipConnection(
+    token: string,
+    options?: {
+      cuitOverride?: string;
+      isProductionOverride?: boolean;
+    },
+  ): Promise<TestAfipConnectionResult> {
+    return request<TestAfipConnectionResult>(
+      '/master/integrations/afip/test-connection',
+      {
+        method: 'POST',
+        body: JSON.stringify(options || {}),
       },
       token,
     );

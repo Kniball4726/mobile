@@ -167,6 +167,38 @@ export interface TestMpConnectionResult {
   message: string;
 }
 
+export interface MaskedAfipSettings {
+  isEnabled: boolean;
+  isProduction: boolean;
+  cuit: string | null;
+  puntoVenta: number | null;
+  hasCert: boolean;
+  certPreview: string | null;
+  hasPrivateKey: boolean;
+  privateKeyMasked: string | null;
+  defaultConcepto: number;
+  defaultCbteTipo: number;
+  updatedAt: string | null;
+}
+
+export interface TestAfipConnectionResult {
+  success: boolean;
+  message: string;
+  environment: 'Homologación (Testing)' | 'Producción';
+  cuit: string | null;
+  servers?: {
+    appServer: string;
+    dbServer: string;
+    authServer: string;
+  };
+  diagnostics?: {
+    cuitValid: boolean;
+    hasCert: boolean;
+    hasPrivateKey: boolean;
+    latencyMs?: number;
+  };
+}
+
 export interface ApiKeyRecord {
   _id?: string;
   id?: string;
