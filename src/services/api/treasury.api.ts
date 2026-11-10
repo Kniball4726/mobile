@@ -1,6 +1,7 @@
 import {
   CashOperationRecord,
   CashRegisterRecord,
+  ClosureSummary,
 } from '../../types/domain.types';
 import { request } from './client';
 
@@ -11,6 +12,22 @@ export const TreasuryApi = {
   ): Promise<CashRegisterRecord[]> {
     return request<CashRegisterRecord[]>(
       `/treasury/registers?branch=${encodeURIComponent(branch)}`,
+      { method: 'GET' },
+      token,
+    );
+  },
+
+  getRegisterSummary(
+    token: string,
+    id: string,
+    declaredCash?: number,
+  ): Promise<ClosureSummary> {
+    const query =
+      typeof declaredCash === 'number'
+        ? `?declaredCash=${encodeURIComponent(declaredCash)}`
+        : '';
+    return request<ClosureSummary>(
+      `/treasury/registers/${encodeURIComponent(id)}/summary${query}`,
       { method: 'GET' },
       token,
     );
@@ -34,10 +51,20 @@ export const TreasuryApi = {
     );
   },
 
-  closeRegister(token: string, id: string): Promise<CashRegisterRecord> {
+  closeRegister(
+    token: string,
+    id: string,
+    payload?: {
+      declaredCash?: number;
+      observations?: string;
+    },
+  ): Promise<CashRegisterRecord> {
     return request<CashRegisterRecord>(
       `/treasury/registers/${encodeURIComponent(id)}/close`,
-      { method: 'PATCH' },
+      {
+        method: 'PATCH',
+        body: payload ? JSON.stringify(payload) : undefined,
+      },
       token,
     );
   },

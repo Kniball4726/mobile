@@ -62,6 +62,29 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
   }, [token]);
 
+  const handleCloseRegisterAdmin = async (
+    registerId: string,
+    cashierName: string,
+  ) => {
+    if (
+      !window.confirm(
+        `¿Desea realizar el cierre administrativo de la caja de "${cashierName}"?`,
+      )
+    ) {
+      return;
+    }
+    try {
+      await TreasuryApi.closeRegister(token, registerId);
+      await loadDashboardData();
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? `Error al cerrar caja: ${err.message}`
+          : 'No se pudo cerrar la caja seleccionada.',
+      );
+    }
+  };
+
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
@@ -341,9 +364,21 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                           Saldo en Caja: ${reg.currentBalance.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </div>
                       </div>
-                      <span className="rounded bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 dark:border-emerald-700 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
-                        ABIERTA
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 dark:border-emerald-700 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                          ABIERTA
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCloseRegisterAdmin(reg.id, reg.userFullName)
+                          }
+                          className="justi-btn-primary text-[10px] py-1 px-2 font-bold"
+                          title="Cerrar turno de caja de este operador"
+                        >
+                          Cerrar Caja
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

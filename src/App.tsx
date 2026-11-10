@@ -10,7 +10,7 @@ import {
   TesoreriaTab,
 } from './types/domain.types';
 import { CatalogApi, TreasuryApi } from './services/api.service';
-import { JustiTopbar } from './components/JustiTopbar';
+import { JustiTopbar } from './components/navigation/JustiTopbar';
 import { LoginView } from './modules/auth/LoginView';
 import { HomeView } from './modules/home/HomeView';
 import { AdminDashboardView } from './modules/home/AdminDashboardView';
@@ -53,7 +53,7 @@ export const App: React.FC = () => {
     return [];
   });
 
-  // Estado de Cajas de Tesorería (Por defecto iniciamos con una Caja "Ventas Sucursal" abierta en PASTEUR)
+  // Estado de Cajas de Tesorería
   const [registers, setRegisters] = useState<CashRegisterRecord[]>(() => {
     try {
       const saved = localStorage.getItem(REGISTERS_STORAGE_KEY);
@@ -61,20 +61,7 @@ export const App: React.FC = () => {
     } catch {
       // ignore
     }
-    return [
-      {
-        id: 'caja-locales-01',
-        userFullName: 'Gregory Rodriguez',
-        branch: 'LOCALES',
-        boxType: 'Ventas Sucursal',
-        openedAt: new Date().toLocaleString('es-AR'),
-        closedAt: null,
-        status: 'ABIERTA',
-        initialBalance: 0,
-        currentBalance: 0,
-        observations: 'Apertura inicial turno LOCALES',
-      },
-    ];
+    return [];
   });
 
   const [operations, setOperations] = useState<CashOperationRecord[]>([]);
@@ -162,9 +149,17 @@ export const App: React.FC = () => {
     }
   };
 
-  const isVentasSucursalOpen = registers.some(
-    (r) => r.status === 'ABIERTA' && r.boxType === 'Ventas Sucursal',
-  );
+  const isVentasSucursalOpen = registers.some((r) => {
+    if (r.status !== 'ABIERTA' || r.boxType !== 'Ventas Sucursal') return false;
+    if (session?.user.role === 'CASHIER') {
+      return (
+        !r.userId ||
+        r.userId === session.user.id ||
+        r.userFullName === session.user.fullName
+      );
+    }
+    return true;
+  });
 
   const handleOpenRegister = async (
     boxType: 'Ventas Sucursal' | 'Caja Consolidada',
@@ -178,14 +173,22 @@ export const App: React.FC = () => {
           observations,
         });
         setRegisters((prev) => [created, ...prev]);
+        await syncTreasury(session.accessToken);
         return;
-      } catch {
-        // Fallback local si el backend está offline
+      } catch (err: unknown) {
+        console.error('Error al abrir caja en backend:', err);
+        alert(
+          err instanceof Error
+            ? `Error al abrir caja: ${err.message}`
+            : 'No se pudo abrir la caja en el servidor.',
+        );
+        return;
       }
     }
     const newReg: CashRegisterRecord = {
       id: `caja-${Date.now()}`,
-      userFullName: session?.user.fullName || 'Gregory Rodriguez',
+      userId: session?.user.id,
+      userFullName: session?.user.fullName || 'Operador',
       branch: userBranch,
       boxType,
       openedAt: new Date().toLocaleString('es-AR'),
@@ -198,14 +201,28 @@ export const App: React.FC = () => {
     setRegisters((prev) => [newReg, ...prev]);
   };
 
-  const handleCloseRegister = async (id: string) => {
+  const handleCloseRegister = async (
+    id: string,
+    payload?: { declaredCash?: number; observations?: string },
+  ) => {
     if (session?.accessToken) {
       try {
-        const closed = await TreasuryApi.closeRegister(session.accessToken, id);
+        const closed = await TreasuryApi.closeRegister(
+          session.accessToken,
+          id,
+          payload,
+        );
         setRegisters((prev) => prev.map((r) => (r.id === id ? closed : r)));
+        await syncTreasury(session.accessToken);
         return;
-      } catch {
-        // Fallback local si el backend está offline
+      } catch (err: unknown) {
+        console.error('Error al cerrar caja en backend:', err);
+        alert(
+          err instanceof Error
+            ? `Error al cerrar caja: ${err.message}`
+            : 'No se pudo realizar el cierre de caja en el servidor.',
+        );
+        return;
       }
     }
     setRegisters((prev) =>
@@ -381,6 +398,7 @@ export const App: React.FC = () => {
 
         {activeScreen === 'APERTURA_CAJA' && session.user.role !== 'CRM' && (
           <TesoreriaView
+            token={session.accessToken}
             user={session.user}
             activeTab={tesoreriaTab}
             onChangeTab={setTesoreriaTab}

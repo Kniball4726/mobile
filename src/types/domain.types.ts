@@ -172,6 +172,7 @@ export interface SaleRecord {
   _id: string;
   receiptNumber: string;
   cashierId: string;
+  registerId?: string | null;
   cashierSnapshot?: {
     id: string;
     fullName: string;
@@ -223,8 +224,54 @@ export type TesoreriaTab =
   | 'OPERACION_CAJA'
   | 'NUEVO_GASTO';
 
+export interface ClosureSummary {
+  registerId: string;
+  userFullName: string;
+  branch: string;
+  boxType: string;
+  status: string;
+  openedAt: string;
+  openedAtIso: string;
+  closedAt: string | null;
+  closedAtIso: string | null;
+  totalSalesCount: number;
+  totalSalesCents: number;
+  totalSales: number;
+  totalsByMethod: {
+    cashCents: number;
+    cash: number;
+    cardCents: number;
+    card: number;
+    qrMpCents: number;
+    qrMp: number;
+    qrScCents: number;
+    qrSc: number;
+    canjesCents: number;
+    canjes: number;
+    otherCents: number;
+    other: number;
+  };
+  operationsSummary: {
+    incomesCents: number;
+    incomes: number;
+    withdrawalsCents: number;
+    withdrawals: number;
+    expensesCents: number;
+    expenses: number;
+  };
+  initialBalanceCents: number;
+  initialBalance: number;
+  expectedCashCents: number;
+  expectedCash: number;
+  declaredCashCents: number;
+  declaredCash: number;
+  differenceCents: number;
+  difference: number;
+}
+
 export interface CashRegisterRecord {
   id: string;
+  userId?: string | null;
   userFullName: string;
   branch: string;
   boxType: 'Ventas Sucursal' | 'Caja Consolidada';
@@ -234,6 +281,7 @@ export interface CashRegisterRecord {
   initialBalance: number;
   currentBalance: number;
   observations: string;
+  closureSummary?: ClosureSummary | null;
 }
 
 export interface CashOperationRecord {

@@ -22,6 +22,7 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
   const [sales, setSales] = useState<SaleRecord[]>([]);
   const [sellers, setSellers] = useState<UserRecord[]>([]);
   const [selectedCashierId, setSelectedCashierId] = useState<string>('');
+  const [activeRegisterOnly, setActiveRegisterOnly] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +50,7 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
         token,
         isAdminOrMaster ? selectedCashierId : undefined,
         100,
+        activeRegisterOnly,
       );
       setSales(list);
     } catch (err: unknown) {
@@ -60,7 +62,7 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [token, isAdminOrMaster, selectedCashierId]);
+  }, [token, isAdminOrMaster, selectedCashierId, activeRegisterOnly]);
 
   useEffect(() => {
     loadSales();
@@ -187,6 +189,31 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
               </label>
             )}
 
+            <div className="inline-flex rounded border border-slate-400 bg-white p-0.5 text-xs shadow-xs">
+              <button
+                type="button"
+                onClick={() => setActiveRegisterOnly(true)}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  activeRegisterOnly
+                    ? 'bg-[#1B5E91] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Caja Activa (Turno)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveRegisterOnly(false)}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  !activeRegisterOnly
+                    ? 'bg-[#1B5E91] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Historial Completo
+              </button>
+            </div>
+
             <div className="flex items-center gap-1.5 w-full sm:w-auto">
               <span className="font-semibold">Buscar:</span>
               <input
@@ -256,8 +283,17 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
               Consultando ventas en MongoDB Atlas...
             </div>
           ) : filteredSales.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-600 bg-white border border-slate-200 rounded">
-              No se encontraron ventas registradas para el filtro seleccionado.
+            <div className="p-6 text-center text-xs text-slate-600 bg-white border border-slate-200 rounded space-y-1">
+              <p className="font-bold text-slate-800">
+                {activeRegisterOnly
+                  ? 'No hay ventas en la caja abierta actual (o la caja ya fue cerrada).'
+                  : 'No se encontraron ventas para el filtro seleccionado.'}
+              </p>
+              {activeRegisterOnly && (
+                <p className="text-[11px] text-slate-500">
+                  Al cerrar la caja, los montos activos se reinician a $0.00. Para consultar ventas anteriores de cajas cerradas, pulsa en <strong>Historial Completo</strong>.
+                </p>
+              )}
             </div>
           ) : (
             filteredSales.map((sale, idx) => {
@@ -343,9 +379,18 @@ export const VentasPorUsuarioView: React.FC<VentasPorUsuarioViewProps> = ({
                 <tr className="bg-[#E5E5F7]">
                   <td
                     colSpan={9}
-                    className="py-4 px-3 text-center text-slate-500"
+                    className="py-6 px-3 text-center text-slate-600 space-y-1"
                   >
-                    No se encontraron ventas registradas.
+                    <p className="font-bold text-slate-800">
+                      {activeRegisterOnly
+                        ? 'No hay ventas en la caja abierta actual (o la caja ya fue cerrada).'
+                        : 'No se encontraron ventas registradas para el filtro seleccionado.'}
+                    </p>
+                    {activeRegisterOnly && (
+                      <p className="text-[11px] text-slate-500">
+                        Al cerrar la caja, los montos activos se reinician a $0.00. Para consultar ventas anteriores de cajas cerradas, pulsa en <strong>Historial Completo</strong>.
+                      </p>
+                    )}
                   </td>
                 </tr>
               ) : (

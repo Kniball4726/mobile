@@ -80,11 +80,15 @@ export const SalesApi = {
     token: string,
     cashierId?: string,
     limit = 100,
+    activeRegisterOnly?: boolean,
   ): Promise<SaleRecord[]> {
     const params = new URLSearchParams();
     params.set('limit', String(limit));
     if (cashierId && cashierId.trim()) {
       params.set('cashierId', cashierId.trim());
+    }
+    if (typeof activeRegisterOnly === 'boolean') {
+      params.set('activeRegisterOnly', String(activeRegisterOnly));
     }
     return request<SaleRecord[]>(
       `/sales?${params.toString()}`,
