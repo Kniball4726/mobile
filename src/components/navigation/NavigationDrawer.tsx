@@ -76,9 +76,9 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <img
-                  src="/ultratech-carreras-logo.png"
+                  src="/ultratech-carreras-logo.svg"
                   alt="UltraTech Carreras"
-                  className="h-8 w-8 rounded-md object-cover shadow border border-slate-300/30"
+                  className="h-8 w-8 object-contain drop-shadow"
                 />
                 <span className="text-lg font-black tracking-tight flex items-center">
                   UltraTech<span className="text-amber-300 ml-1">Carreras</span>

@@ -110,9 +110,9 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
               title="Ir a Inicio - UltraTech Carreras"
             >
               <img
-                src="/ultratech-carreras-logo.png"
+                src="/ultratech-carreras-logo.svg"
                 alt="UltraTech Carreras"
-                className="h-7 w-7 rounded object-cover shadow-sm border border-slate-300/30"
+                className="h-7 w-7 object-contain drop-shadow-sm"
               />
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center">
                 UltraTech<span className="text-amber-300 ml-1">Carreras</span>

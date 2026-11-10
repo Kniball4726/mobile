@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 300" fill="none">
+  <defs>
+    <filter id="goldDepthShadowBanner" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.5" />
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+
+    <linearGradient id="goldMetallicB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#996515" />
+      <stop offset="20%" stop-color="#D4AF37" />
+      <stop offset="40%" stop-color="#FFF3BD" />
+      <stop offset="60%" stop-color="#F3CA65" />
+      <stop offset="80%" stop-color="#B8860B" />
+      <stop offset="100%" stop-color="#7A520E" />
+    </linearGradient>
+
+    <linearGradient id="amberSpeedB" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.1" />
+      <stop offset="50%" stop-color="#FBBF24" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#FDE68A" stop-opacity="1" />
+    </linearGradient>
+
+    <linearGradient id="runnerGoldB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF6CC" />
+      <stop offset="35%" stop-color="#F5C451" />
+      <stop offset="70%" stop-color="#D49B28" />
+      <stop offset="100%" stop-color="#946210" />
+    </linearGradient>
+
+    <linearGradient id="goldStrokeB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC" />
+      <stop offset="50%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#6B4706" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#goldDepthShadowBanner)">
+    <!-- ESTELAS DE VELOCIDAD -->
+    <g opacity="0.9">
+      <path d="M 20 100 L 140 100 L 125 107 L 35 107 Z" fill="url(#amberSpeedB)" opacity="0.5" />
+      <path d="M 10 125 L 130 125 L 115 133 L 25 133 Z" fill="url(#amberSpeedB)" opacity="0.8" />
+      <path d="M 5 152 L 120 152 L 105 161 L 20 161 Z" fill="url(#amberSpeedB)" />
+      <path d="M 25 180 L 140 180 L 125 188 L 40 188 Z" fill="url(#amberSpeedB)" opacity="0.7" />
+    </g>
+
+    <!-- ATLETA CORRIENDO -->
+    <g transform="translate(60, 60)">
+      <circle cx="82" cy="18" r="14" fill="url(#runnerGoldB)" stroke="url(#goldStrokeB)" stroke-width="1.2" />
+      <path d="M 72 32 C 76 34, 88 38, 92 50 C 96 62, 88 82, 82 92 L 62 82 C 66 70, 70 54, 64 42 Z" 
+            fill="url(#runnerGoldB)" stroke="url(#goldStrokeB)" stroke-width="1.2" />
+      <path d="M 86 48 L 112 36 L 124 54 L 116 58 L 106 46 L 84 56 Z" 
+            fill="url(#runnerGoldB)" stroke="url(#goldStrokeB)" stroke-width="1" />
+      <path d="M 68 50 L 42 66 L 32 86 L 26 82 L 36 62 L 64 44 Z" 
+            fill="url(#runnerGoldB)" opacity="0.9" />
+      <path d="M 80 88 L 114 106 L 106 142 L 112 144 L 124 140 L 118 102 L 84 78 Z" 
+            fill="url(#runnerGoldB)" stroke="url(#goldStrokeB)" stroke-width="1.2" />
+      <path d="M 66 84 L 38 108 L 10 134 L 4 130 L 28 100 L 58 76 Z" 
+            fill="url(#runnerGoldB)" stroke="url(#goldStrokeB)" stroke-width="1.2" />
+    </g>
+
+    <!-- BLOQUE MARCA ULTRA TECH -->
+    <g transform="translate(240, 50)">
+      <text x="0" y="65" 
+            fill="url(#goldMetallicB)" 
+            stroke="url(#goldStrokeB)" 
+            stroke-width="1.5"
+            stroke-linejoin="round"
+            font-family="system-ui, -apple-system, 'Impact', 'Arial Black', sans-serif" 
+            font-weight="900" 
+            font-size="70" 
+            letter-spacing="2">
+        ULTRA TECH
+      </text>
+
+      <!-- LÍNEA DINÁMICA -->
+      <polygon points="0,85 640,85 620,92 0,92" fill="url(#goldMetallicB)" />
+      
+      <!-- CARRERAS -->
+      <text x="0" y="152" 
+            fill="url(#goldMetallicB)" 
+            stroke="url(#goldStrokeB)" 
+            stroke-width="1.5"
+            stroke-linejoin="round"
+            font-family="system-ui, -apple-system, 'Montserrat', 'Impact', sans-serif" 
+            font-style="italic" 
+            font-weight="900" 
+            font-size="54" 
+            letter-spacing="9">
+        CARRERAS
+      </text>
+
+      <!-- PASTILLA NUTRICIÓN DEPORTIVA -->
+      <g transform="translate(0, 178)">
+        <rect x="0" y="0" width="580" height="24" rx="4" fill="#0F172A" fill-opacity="0.75" stroke="url(#goldStrokeB)" stroke-width="0.8" />
+        <text x="290" y="16" 
+              text-anchor="middle"
+              fill="#FFFBEA" 
+              font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" 
+              font-weight="800" 
+              font-size="11.5" 
+              letter-spacing="2.8">
+          ADVANCED TECHNOLOGY IN SPORTS NUTRITION
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,207 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Filtro de sombra profunda para máximo contraste sobre fondos claros y oscuros -->
+    <filter id="goldDepthShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.55" />
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+
+    <!-- Gradiente Metálico Oro Principal (ULTRA TECH) -->
+    <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#996515" />
+      <stop offset="18%" stop-color="#D4AF37" />
+      <stop offset="38%" stop-color="#FFF3BD" />
+      <stop offset="55%" stop-color="#F3CA65" />
+      <stop offset="78%" stop-color="#B8860B" />
+      <stop offset="100%" stop-color="#7A520E" />
+    </linearGradient>
+
+    <!-- Gradiente Brillo Ámbar Deportivo (Carreras y Estelas) -->
+    <linearGradient id="amberSpeed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.2" />
+      <stop offset="40%" stop-color="#FBBF24" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#FDE68A" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Gradiente Corredor Atleta -->
+    <linearGradient id="runnerGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF6CC" />
+      <stop offset="35%" stop-color="#F5C451" />
+      <stop offset="70%" stop-color="#D49B28" />
+      <stop offset="100%" stop-color="#946210" />
+    </linearGradient>
+
+    <!-- Gradiente Contorno Fino -->
+    <linearGradient id="goldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC" />
+      <stop offset="50%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#6B4706" />
+    </linearGradient>
+  </defs>
+
+  <!-- GRUPO PRINCIPAL CON SOMBRA DE CONTRASTE -->
+  <g filter="url(#goldDepthShadow)">
+
+    <!-- ============================================== -->
+    <!-- ESTELAS DE VELOCIDAD DINÁMICAS (SPEED TRAILS)  -->
+    <!-- ============================================== -->
+    <g opacity="0.9">
+      <!-- Estela 1 (Superior) -->
+      <path d="M 60 178 L 195 178 L 180 185 L 75 185 Z" fill="url(#amberSpeed)" opacity="0.6" />
+      <!-- Estela 2 (Media) -->
+      <path d="M 40 205 L 180 205 L 165 213 L 55 213 Z" fill="url(#amberSpeed)" opacity="0.85" />
+      <!-- Estela 3 (Principal corredor) -->
+      <path d="M 25 235 L 170 235 L 150 244 L 45 244 Z" fill="url(#amberSpeed)" />
+      <!-- Estela 4 (Baja pierna) -->
+      <path d="M 50 268 L 190 268 L 172 276 L 68 276 Z" fill="url(#amberSpeed)" opacity="0.7" />
+      <!-- Estela 5 (Base impulso) -->
+      <path d="M 85 300 L 210 300 L 192 307 L 105 307 Z" fill="url(#amberSpeed)" opacity="0.5" />
+    </g>
+
+    <!-- ============================================== -->
+    <!-- SILUETA DEL ATLETA CORRIENDO EN VELOCIDAD      -->
+    <!-- ============================================== -->
+    <g transform="translate(115, 140)">
+      <!-- Cabeza en inclinación aerodinámica -->
+      <circle cx="82" cy="18" r="14" fill="url(#runnerGold)" stroke="url(#goldStroke)" stroke-width="1.2" />
+
+      <!-- Torso muscular proyectado hacia adelante -->
+      <path d="M 72 32 
+               C 76 34, 88 38, 92 50 
+               C 96 62, 88 82, 82 92 
+               L 62 82 
+               C 66 70, 70 54, 64 42 
+               Z" 
+            fill="url(#runnerGold)" stroke="url(#goldStroke)" stroke-width="1.2" />
+
+      <!-- Brazo Delantero (impulsando hacia adelante) -->
+      <path d="M 86 48 
+               L 112 36 
+               L 124 54 
+               L 116 58 
+               L 106 46 
+               L 84 56 Z" 
+            fill="url(#runnerGold)" stroke="url(#goldStroke)" stroke-width="1" />
+
+      <!-- Brazo Trasero (en extensión posterior) -->
+      <path d="M 68 50 
+               L 42 66 
+               L 32 86 
+               L 26 82 
+               L 36 62 
+               L 64 44 Z" 
+            fill="url(#runnerGold)" opacity="0.9" />
+
+      <!-- Pierna Delantera (rodilla alta en zancada potente) -->
+      <path d="M 80 88 
+               L 114 106 
+               L 106 142 
+               L 112 144 
+               L 124 140 
+               L 118 102 
+               L 84 78 Z" 
+            fill="url(#runnerGold)" stroke="url(#goldStroke)" stroke-width="1.2" />
+
+      <!-- Pierna Trasera (en extensión total de propulsión) -->
+      <path d="M 66 84 
+               L 38 108 
+               L 10 134 
+               L 4 130 
+               L 28 100 
+               L 58 76 Z" 
+            fill="url(#runnerGold)" stroke="url(#goldStroke)" stroke-width="1.2" />
+    </g>
+
+    <!-- ============================================== -->
+    <!-- LOGO DE MARCA: ULTRA TECH                      -->
+    <!-- ============================================== -->
+    <g transform="translate(255, 140)">
+      <!-- ULTRA -->
+      <text x="0" y="65" 
+            fill="url(#goldMetallic)" 
+            stroke="url(#goldStroke)" 
+            stroke-width="1.5"
+            stroke-linejoin="round"
+            font-family="system-ui, -apple-system, 'Impact', 'Arial Black', sans-serif" 
+            font-weight="900" 
+            font-size="68" 
+            letter-spacing="2">
+        ULTRA
+      </text>
+
+      <!-- TECH -->
+      <text x="0" y="132" 
+            fill="url(#goldMetallic)" 
+            stroke="url(#goldStroke)" 
+            stroke-width="1.5"
+            stroke-linejoin="round"
+            font-family="system-ui, -apple-system, 'Impact', 'Arial Black', sans-serif" 
+            font-weight="900" 
+            font-size="68" 
+            letter-spacing="2">
+        TECH
+      </text>
+    </g>
+
+    <!-- ============================================== -->
+    <!-- LÍNEA DINÁMICA SEPARADORA DEPORTIVA            -->
+    <!-- ============================================== -->
+    <g transform="translate(45, 310)">
+      <polygon points="0,0 422,0 407,6 0,6" fill="url(#goldMetallic)" />
+      <polygon points="35,10 422,10 412,13 35,13" fill="#D4AF37" opacity="0.8" />
+    </g>
+
+    <!-- ============================================== -->
+    <!-- SECCIÓN CARRERAS (TIPOGRAFÍA ATLÉTICA SPEED)   -->
+    <!-- ============================================== -->
+    <g transform="translate(256, 375)">
+      <!-- Sombra / Refuerzo de contraste para CARRERAS -->
+      <text x="0" y="0" 
+            text-anchor="middle"
+            fill="#0F172A" 
+            font-family="system-ui, -apple-system, 'Montserrat', 'Impact', sans-serif" 
+            font-style="italic" 
+            font-weight="900" 
+            font-size="52" 
+            letter-spacing="10"
+            opacity="0.75"
+            transform="translate(0, 3)">
+        CARRERAS
+      </text>
+
+      <!-- Texto Principal CARRERAS en Oro Radiante -->
+      <text x="0" y="0" 
+            text-anchor="middle"
+            fill="url(#goldMetallic)" 
+            stroke="url(#goldStroke)" 
+            stroke-width="1.5"
+            stroke-linejoin="round"
+            font-family="system-ui, -apple-system, 'Montserrat', 'Impact', sans-serif" 
+            font-style="italic" 
+            font-weight="900" 
+            font-size="52" 
+            letter-spacing="10">
+        CARRERAS
+      </text>
+    </g>
+
+    <!-- ============================================== -->
+    <!-- LEMA OFICIAL ULTRA TECH: SPORTS NUTRITION      -->
+    <!-- ============================================== -->
+    <g transform="translate(256, 420)">
+      <!-- Pastilla sutil de soporte para legibilidad universal -->
+      <rect x="-195" y="-14" width="390" height="20" rx="4" fill="#0F172A" fill-opacity="0.65" stroke="url(#goldStroke)" stroke-width="0.8" />
+      
+      <text x="0" y="0" 
+            text-anchor="middle"
+            fill="#FFFBEA" 
+            font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" 
+            font-weight="800" 
+            font-size="11.5" 
+            letter-spacing="2.8">
+        ADVANCED TECHNOLOGY IN SPORTS NUTRITION
+      </text>
+    </g>
+
+  </g>
+</svg>
