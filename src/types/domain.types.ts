@@ -85,6 +85,11 @@ export interface CustomerItem {
   fullName: string;
   email: string;
   branch?: BranchType;
+  dni?: string;
+  taxId?: string;
+  ivaCondition?: string;
+  creditAccountBalance?: number;
+  creditLimit?: number;
   activeDiscount: {
     isAvailable: boolean;
     percentage: number;

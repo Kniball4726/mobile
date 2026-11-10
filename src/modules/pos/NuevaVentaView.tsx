@@ -39,7 +39,9 @@ const JUSTI_PAYMENT_METHODS: Array<{
   backendMethod: 'CASH' | 'CARD' | 'TRANSFER';
 }> = [
   { label: 'Efectivo', backendMethod: 'CASH' },
+  { label: 'TARJETA DE CREDITO/DEB', backendMethod: 'CARD' },
   { label: 'Tarjeta debito/credito', backendMethod: 'CARD' },
+  { label: 'TARJETA DE CRÉDITO/DÉBITO', backendMethod: 'CARD' },
   { label: 'QR mercado pago', backendMethod: 'TRANSFER' },
   { label: 'QR sport club', backendMethod: 'TRANSFER' },
   { label: 'diferencia vuelto / canjes', backendMethod: 'CASH' },
@@ -398,7 +400,11 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
   const isCardPayment =
     selectedPayOption.backendMethod === 'CARD' ||
-    paymentLabel.toUpperCase().includes('TARJETA');
+    paymentLabel.toUpperCase().includes('TARJETA') ||
+    paymentLabel.toUpperCase().includes('CREDITO') ||
+    paymentLabel.toUpperCase().includes('CRÉDITO') ||
+    paymentLabel.toUpperCase().includes('DEBITO') ||
+    paymentLabel.toUpperCase().includes('DÉBITO');
 
   const handleCheckout = async () => {
     setError(null);
@@ -589,7 +595,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         )}
 
         {/* Cabecera del Comprobante: 100% Responsive en Móvil y Escritorio */}
-        <div className="rounded border border-slate-300 dark:border-slate-700 bg-[#F4F9FE] dark:bg-slate-800/90 p-2.5 sm:p-3 shadow-sm transition-colors">
+        <div className="rounded border border-slate-300 dark:border-slate-700 bg-[#F4F9FE] dark:bg-slate-900 p-2.5 sm:p-3 shadow-sm transition-colors">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
             {/* Columna Izquierda: Fecha, Cliente, Vendedor */}
             <div className="lg:col-span-5 space-y-2.5 text-xs">
@@ -602,12 +608,12 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                     type="text"
                     readOnly
                     value={todayFormatted}
-                    className="justi-input w-full sm:w-28 bg-white dark:bg-slate-800 dark:text-slate-100"
+                    className="justi-input w-full sm:w-28 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                   />
                 </div>
                 <div className="sm:hidden flex items-end justify-end">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-lg font-extrabold text-slate-900 dark:text-slate-100">
-                    X
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-lg font-black text-slate-900 dark:text-slate-100 shadow-sm">
+                    {comprobante.includes('Factura B') ? 'B' : 'A'}
                   </span>
                 </div>
               </div>
@@ -634,7 +640,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                         setShowCustomerDropdown(true);
                       }}
                       placeholder="Buscar cliente por nombre o email..."
-                      className="justi-input w-full font-medium"
+                      className="justi-input w-full font-medium bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                     />
 
                     {showCustomerDropdown && customerResults.length > 0 && (
@@ -738,7 +744,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 <label className="sm:w-20 font-semibold text-slate-700 dark:text-slate-200">
                   Vendedor:
                 </label>
-                <select className="justi-select w-full sm:w-52">
+                <select className="justi-select w-full sm:w-52 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700">
                   <option>{user.fullName}</option>
                   <option>Gregory Rodriguez</option>
                   <option>Daniel Cajero</option>
@@ -746,11 +752,23 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </div>
             </div>
 
-            {/* Columna Central: Letra "X" en Desktop */}
-            <div className="hidden lg:flex lg:col-span-2 items-center justify-center">
-              <span className="text-3xl font-bold text-slate-900 dark:text-slate-100 select-none">
-                X
+            {/* Columna Central: Letra "A" y Datos Fiscales / Cuenta Corriente como en JUSTI Gestión */}
+            <div className="hidden lg:flex lg:col-span-2 flex-col items-center justify-center text-center px-1">
+              <span className="text-3xl font-black text-slate-800 dark:text-slate-100 select-none leading-none mb-1">
+                {comprobante.includes('Factura B') ? 'B' : 'A'}
               </span>
+              <div className="text-[10px] leading-tight space-y-0.5 text-slate-600 dark:text-slate-300 font-medium">
+                <div>Saldo Cta Cte: <span className="font-bold font-mono">0.00</span></div>
+                <div>Saldo Cuotas: <span className="font-bold font-mono">0.00</span></div>
+                <div>Límite Max. Crédito: <span className="font-bold">Ilimitado</span></div>
+                <div>Coeficiente: <span className="font-bold font-mono">1.00</span></div>
+                <div>Condición de IVA: <span className="font-bold uppercase">{selectedCustomer?.ivaCondition || 'CONSUMIDOR FINAL'}</span></div>
+                <div>
+                  DNI: <span className={`font-bold ${selectedCustomer?.dni || selectedCustomer?.taxId ? 'font-mono text-slate-800 dark:text-slate-100' : 'text-red-600 dark:text-red-400'}`}>
+                    {selectedCustomer?.dni || selectedCustomer?.taxId || 'No Registrado'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Columna Derecha: Comprobante, Sucursal, Nº Remito */}
@@ -762,7 +780,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 <select
                   value={comprobante}
                   onChange={(e) => setComprobante(e.target.value)}
-                  className="justi-select w-full lg:w-48 text-slate-700 dark:text-slate-200"
+                  className="justi-select w-full lg:w-48 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 dark:border-slate-700"
                 >
                   <option>Nota de Venta</option>
                   <option>Factura B</option>
@@ -783,7 +801,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       ? 'Sucursal asignada por el Administrador (bloqueada)'
                       : 'Seleccionar sucursal'
                   }
-                  className="justi-select w-full lg:w-48 font-semibold disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-700 dark:disabled:text-slate-400 disabled:cursor-not-allowed"
+                  className="justi-select w-full lg:w-48 font-semibold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-800/60 disabled:text-slate-700 dark:disabled:text-slate-400 disabled:cursor-not-allowed"
                 >
                   <option value="LOCALES">LOCALES</option>
                   <option value="CARRERAS">CARRERAS</option>
@@ -799,7 +817,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   value={remitoNumber}
                   onChange={(e) => setRemitoNumber(e.target.value)}
                   placeholder="Opcional"
-                  className="justi-input w-full lg:w-48"
+                  className="justi-input w-full lg:w-48 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                 />
               </div>
             </div>
@@ -807,21 +825,21 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         </div>
 
         {/* SECCIÓN: ARTÍCULOS VENDIDOS */}
-        <div className="border border-[#80AED8] bg-[#E8ECF8] rounded-sm overflow-hidden">
-          <div className="justi-section-header flex items-center justify-between gap-2">
+        <div className="border border-[#80AED8] dark:border-slate-700 bg-[#E8ECF8] dark:bg-slate-900 rounded-sm overflow-hidden">
+          <div className="justi-section-header dark:bg-slate-800 flex items-center justify-between gap-2">
             <span>Artículos Vendidos</span>
             <button
               type="button"
               onClick={() => setIsCameraOpen(true)}
-              className="inline-flex items-center gap-1 rounded bg-white px-2.5 py-1 text-[11px] font-bold text-[#1B5E91] shadow-sm hover:bg-slate-50"
+              className="inline-flex items-center gap-1 rounded bg-white dark:bg-slate-800 border dark:border-slate-600 px-2.5 py-1 text-[11px] font-bold text-[#1B5E91] dark:text-sky-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700"
             >
-              <Camera className="h-3.5 w-3.5 text-emerald-700" />
+              <Camera className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" />
               <span>Escanear con Cámara</span>
             </button>
           </div>
 
           {/* Buscador por Código de Barras / SKU / Nombre */}
-          <div className="p-2 bg-[#DCEAF7] border-b border-[#9CC2E5] relative">
+          <div className="p-2 bg-[#DCEAF7] dark:bg-slate-800/90 border-b border-[#9CC2E5] dark:border-slate-700 relative">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -840,9 +858,9 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   value={codeSearch}
                   onChange={(e) => setCodeSearch(e.target.value)}
                   placeholder="Código EAN-13, SKU o nombre del suplemento..."
-                  className="justi-input w-full pl-9 py-2.5 sm:py-2 text-sm font-semibold"
+                  className="justi-input w-full pl-9 py-2.5 sm:py-2 text-sm font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                 />
-                <Barcode className="absolute left-2.5 top-3 sm:top-2.5 h-4 w-4 text-[#1B5E91]" />
+                <Barcode className="absolute left-2.5 top-3 sm:top-2.5 h-4 w-4 text-[#1B5E91] dark:text-sky-400" />
               </div>
               <div className="grid grid-cols-2 sm:flex gap-1.5">
                 <button
@@ -856,35 +874,35 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   onClick={() => setIsCameraOpen(true)}
                   className="sm:hidden justi-btn-primary py-2 font-bold"
                 >
-                  <Camera className="mr-1 h-4 w-4 text-emerald-700" />
+                  <Camera className="mr-1 h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                   Usar Cámara
                 </button>
               </div>
             </form>
 
             {productSuggestions.length > 0 && (
-              <div className="absolute left-2 right-2 mt-1 max-h-64 overflow-y-auto rounded border border-[#4E8EC2] bg-white shadow-2xl z-30">
+              <div className="absolute left-2 right-2 mt-1 max-h-64 overflow-y-auto rounded border border-[#4E8EC2] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xl z-30">
                 {productSuggestions.map((prod) => (
                   <button
                     key={prod._id}
                     type="button"
                     onClick={() => addProductToCart(prod)}
-                    className="flex w-full items-center justify-between border-b border-slate-100 px-3 py-2.5 text-left text-xs hover:bg-[#E8F2FC]"
+                    className="flex w-full items-center justify-between border-b border-slate-100 dark:border-slate-700 px-3 py-2.5 text-left text-xs hover:bg-[#E8F2FC] dark:hover:bg-slate-700"
                   >
                     <div className="min-w-0 pr-2">
-                      <span className="font-mono font-bold text-[#1B5E91] mr-1.5">
+                      <span className="font-mono font-bold text-[#1B5E91] dark:text-sky-400 mr-1.5">
                         [{prod.sku}]
                       </span>
-                      <span className="font-semibold text-slate-900">
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">
                         {prod.name}
                       </span>
                       {prod.barcode && (
-                        <span className="block sm:inline sm:ml-2 font-mono text-[10px] text-slate-500">
+                        <span className="block sm:inline sm:ml-2 font-mono text-[10px] text-slate-500 dark:text-slate-400">
                           EAN: {prod.barcode}
                         </span>
                       )}
                     </div>
-                    <span className="shrink-0 font-bold text-emerald-800">
+                    <span className="shrink-0 font-bold text-emerald-800 dark:text-emerald-300">
                       ${prod.price.toLocaleString('es-AR')}
                     </span>
                   </button>
@@ -1054,7 +1072,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           <div className="hidden lg:block overflow-x-auto">
             <table className="w-full border-collapse text-[11px]">
               <thead>
-                <tr className="bg-[#DCEAF7] text-[#1B5E91] border-b border-[#9CC2E5]">
+                <tr className="bg-[#DCEAF7] dark:bg-slate-900 text-[#1B5E91] dark:text-sky-300 border-b border-[#9CC2E5] dark:border-slate-700">
                   <th className="py-2 px-2 text-left">Código</th>
                   <th className="py-2 px-2 text-left">
                     Rubro -&gt; Subrubro
@@ -1084,10 +1102,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               </thead>
               <tbody>
                 {cart.length === 0 ? (
-                  <tr className="bg-[#E5E5F7]">
+                  <tr className="bg-[#E5E5F7] dark:bg-slate-800/60">
                     <td
                       colSpan={13}
-                      className="py-3 px-3 text-center text-slate-500"
+                      className="py-3 px-3 text-center text-slate-500 dark:text-slate-400"
                     >
                       Sin artículos cargados. Use el lector de código de barras
                       o el buscador superior.
@@ -1117,22 +1135,22 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                     return (
                       <tr
                         key={item.product._id}
-                        className="border-b border-slate-300 bg-[#E5E5F7]"
+                        className="border-b border-slate-300 dark:border-slate-700 bg-[#E5E5F7] dark:bg-slate-800/90 text-slate-900 dark:text-slate-100"
                       >
-                        <td className="p-1.5 font-mono font-bold">
+                        <td className="p-1.5 font-mono font-bold text-slate-800 dark:text-slate-100">
                           {item.product.sku}
                         </td>
                         <td className="p-1.5">
-                          <span className="block rounded bg-slate-200 px-2 py-0.5 text-slate-700">
+                          <span className="block rounded bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-slate-700 dark:text-slate-200">
                             {rubroName}
                           </span>
                         </td>
                         <td className="p-1.5">
-                          <span className="block rounded bg-slate-200 px-2 py-0.5 text-slate-700">
+                          <span className="block rounded bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-slate-700 dark:text-slate-200">
                             ULTRA TECH
                           </span>
                         </td>
-                        <td className="p-2 font-bold text-slate-900 text-xs">
+                        <td className="p-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
                           {item.product.name}
                         </td>
                         <td className="p-1.5 text-center">
@@ -1146,12 +1164,12 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                                 Number(e.target.value) || 1,
                               )
                             }
-                            className="justi-input w-16 text-right font-bold"
+                            className="justi-input w-16 text-right font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                           />
                         </td>
-                        <td className="p-1.5 text-right font-mono bg-white/80">
+                        <td className="p-1.5 text-right font-mono bg-white/80 dark:bg-slate-900/80">
                           <div className="flex items-center justify-end gap-1">
-                            <span className="text-slate-500 font-bold">$</span>
+                            <span className="text-slate-500 dark:text-slate-400 font-bold">$</span>
                             <input
                               type="number"
                               step="0.01"
@@ -1164,12 +1182,12 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                                     : parseFloat(e.target.value);
                                 updatePrice(item.product._id, isNaN(val) ? 0 : val);
                               }}
-                              className="justi-input w-28 text-right font-mono font-bold py-1 px-1.5 text-xs text-slate-900 focus:bg-amber-50"
+                              className="justi-input w-28 text-right font-mono font-bold py-1 px-1.5 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 dark:border-slate-700 focus:bg-amber-50 dark:focus:bg-slate-800"
                               title="Precio unitario con impuestos modificable por el vendedor"
                             />
                           </div>
                         </td>
-                        <td className="p-1.5 text-right font-mono bg-white/80">
+                        <td className="p-1.5 text-right font-mono bg-white/80 dark:bg-slate-900/80">
                           <div className="flex flex-col items-end gap-1">
                             <div className="flex items-center justify-end gap-1">
                               <input
@@ -1193,10 +1211,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                                   finalizeItemDiscount(item.product._id)
                                 }
                                 placeholder="-0%"
-                                className="justi-input w-20 text-right font-mono font-bold py-1 px-1.5 text-xs text-emerald-800 focus:bg-emerald-50"
+                                className="justi-input w-20 text-right font-mono font-bold py-1 px-1.5 text-xs text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 dark:border-slate-700 focus:bg-emerald-50 dark:focus:bg-slate-800"
                                 title="Descuento (ej. -15 o 15) o recargo (+10)"
                               />
-                              <span className="text-[10px] font-bold text-emerald-800">
+                              <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-400">
                                 %
                               </span>
                             </div>
@@ -1211,7 +1229,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                                   className={`px-1 py-0.5 text-[9px] rounded font-bold transition-colors ${
                                     descPercent === pct
                                       ? 'bg-emerald-700 text-white'
-                                      : 'bg-slate-200 text-slate-700 hover:bg-emerald-100'
+                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-100 dark:hover:bg-slate-600'
                                   }`}
                                 >
                                   {pct === 0 ? '0%' : `-${pct}%`}
@@ -1220,26 +1238,26 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                             </div>
                           </div>
                         </td>
-                        <td className="p-1.5 text-right font-mono font-semibold text-slate-900 bg-slate-200">
+                        <td className="p-1.5 text-right font-mono font-semibold text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700/80">
                           {priceWithDesc.toFixed(2)}
                         </td>
-                        <td className="p-1.5 text-right font-mono bg-slate-200">
+                        <td className="p-1.5 text-right font-mono text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700/80">
                           {subSinImp.toFixed(2)}
                         </td>
-                        <td className="p-1.5 text-center font-mono bg-slate-200">
+                        <td className="p-1.5 text-center font-mono text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700/80">
                           21.00
                         </td>
-                        <td className="p-1.5 text-center font-mono bg-slate-200">
+                        <td className="p-1.5 text-center font-mono text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700/80">
                           0.00
                         </td>
-                        <td className="p-1.5 text-right font-mono font-bold bg-slate-200">
+                        <td className="p-1.5 text-right font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700/80">
                           {subConImp.toFixed(2)}
                         </td>
                         <td className="p-1.5 text-center">
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.product._id, 0)}
-                            className="rounded border border-[#80AED8] bg-[#DCEAF7] p-1 text-[#1B5E91] hover:bg-red-100 hover:text-red-700"
+                            className="rounded border border-[#80AED8] dark:border-slate-600 bg-[#DCEAF7] dark:bg-slate-700 p-1 text-[#1B5E91] dark:text-sky-300 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-700 dark:hover:text-red-400"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -1253,9 +1271,9 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           </div>
 
           {/* Barra de Descuento General de la Venta (Opción B) */}
-          <div className="p-2.5 bg-gradient-to-r from-[#DCEAF7] via-[#E8F2FC] to-[#DCEAF7] border-y border-[#9CC2E5] flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="p-2.5 bg-gradient-to-r from-[#DCEAF7] via-[#E8F2FC] to-[#DCEAF7] dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-y border-[#9CC2E5] dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-[#1B5E91] text-xs uppercase tracking-wide">
+              <span className="font-bold text-[#1B5E91] dark:text-sky-300 text-xs uppercase tracking-wide">
                 Descuento General Venta:
               </span>
               <div className="flex items-center gap-1">
@@ -1266,15 +1284,15 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                     handleGeneralDiscountInputChange(e.target.value)
                   }
                   placeholder="-0%"
-                  className="justi-input w-24 text-right font-mono font-bold py-1 px-2 text-xs text-emerald-800 focus:bg-emerald-50"
+                  className="justi-input w-24 text-right font-mono font-bold py-1 px-2 text-xs text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 dark:border-slate-700 focus:bg-emerald-50 dark:focus:bg-slate-800"
                   title="Ej: -15 o 15 para 15% de descuento, +10 para 10% de recargo"
                 />
-                <span className="font-bold text-emerald-800 text-xs">%</span>
+                <span className="font-bold text-emerald-800 dark:text-emerald-400 text-xs">%</span>
               </div>
             </div>
 
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] font-semibold text-slate-600 mr-1">
+              <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mr-1">
                 Accesos rápidos:
               </span>
               {[
@@ -1291,7 +1309,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   className={`px-2.5 py-1 text-xs rounded font-bold transition-all ${
                     generalDiscountPercent === btn.val
                       ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-800'
-                      : 'bg-white text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-800 dark:hover:text-emerald-300'
                   }`}
                 >
                   {btn.label}
@@ -1301,54 +1319,54 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
           </div>
 
           {/* Franja Azul de Totales (#80AED8) */}
-          <div className="justi-totals-strip p-2.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs">
+          <div className="justi-totals-strip dark:bg-slate-900 p-2.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs">
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 Total Neto
               </div>
-              <div className="rounded bg-slate-200 px-2 py-1 text-right font-mono font-bold">
+              <div className="rounded bg-slate-200 dark:bg-slate-800 dark:text-slate-100 px-2 py-1 text-right font-mono font-bold">
                 {totals.netWithoutTax.toFixed(2)}
               </div>
             </div>
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 Total Exento
               </div>
-              <div className="rounded bg-slate-200 px-2 py-1 text-right font-mono font-bold">
+              <div className="rounded bg-slate-200 dark:bg-slate-800 dark:text-slate-100 px-2 py-1 text-right font-mono font-bold">
                 0.00
               </div>
             </div>
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 Total I.V.A.
               </div>
-              <div className="rounded bg-slate-200 px-2 py-1 text-right font-mono font-bold">
+              <div className="rounded bg-slate-200 dark:bg-slate-800 dark:text-slate-100 px-2 py-1 text-right font-mono font-bold">
                 {totals.ivaAmount.toFixed(2)}
               </div>
             </div>
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 Imp. Internos
               </div>
-              <div className="rounded bg-slate-200 px-2 py-1 text-right font-mono font-bold">
+              <div className="rounded bg-slate-200 dark:bg-slate-800 dark:text-slate-100 px-2 py-1 text-right font-mono font-bold">
                 0.00
               </div>
             </div>
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 Descuentos / Rec.
               </div>
-              <div className="rounded bg-white px-2 py-1 text-right font-mono font-bold text-emerald-800">
+              <div className="rounded bg-white dark:bg-slate-800 border dark:border-slate-700 px-2 py-1 text-right font-mono font-bold text-emerald-800 dark:text-emerald-400">
                 {totals.discountPesos > 0
                   ? `-${totals.discountPesos.toFixed(2)}`
                   : '0.00'}
               </div>
             </div>
             <div>
-              <div className="font-bold text-slate-900 mb-0.5 text-[11px]">
+              <div className="font-bold text-slate-900 dark:text-slate-200 mb-0.5 text-[11px]">
                 T O T A L
               </div>
-              <div className="rounded bg-white border border-[#1B5E91] px-2 py-1 text-right font-mono font-extrabold text-[#1B5E91]">
+              <div className="rounded bg-white dark:bg-slate-800 border border-[#1B5E91] dark:border-sky-500 px-2 py-1 text-right font-mono font-extrabold text-[#1B5E91] dark:text-sky-300">
                 ${totals.finalTotalPesos.toFixed(2)}
               </div>
             </div>
@@ -1386,7 +1404,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 <select
                   value={selectedCardPlan}
                   onChange={(e) => setSelectedCardPlan(e.target.value)}
-                  className="justi-select w-full text-xs font-semibold"
+                  className="justi-select w-full text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                 >
                   {JUSTI_CARD_PLANS.map((plan) => (
                     <option key={plan} value={plan}>
@@ -1406,7 +1424,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   type="text"
                   readOnly
                   value={`$${totals.grossPesos.toFixed(2)}`}
-                  className="justi-input w-full text-right font-mono text-xs"
+                  className="justi-input w-full text-right font-mono text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                 />
               </div>
               <div>
@@ -1417,7 +1435,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   type="text"
                   readOnly
                   value={`${activeDiscountPercent.toFixed(1)}%`}
-                  className="justi-input w-full text-right font-mono text-xs font-bold text-emerald-800 dark:text-emerald-400"
+                  className="justi-input w-full text-right font-mono text-xs font-bold text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 dark:border-slate-700"
                 />
               </div>
               <div>
@@ -1428,7 +1446,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   type="text"
                   readOnly
                   value={`$${totals.finalTotalPesos.toFixed(2)}`}
-                  className="justi-input w-full text-right font-mono text-xs font-extrabold text-[#1B5E91] dark:text-sky-300"
+                  className="justi-input w-full text-right font-mono text-xs font-extrabold text-[#1B5E91] dark:text-sky-300 bg-white dark:bg-slate-900 dark:border-slate-700"
                 />
               </div>
             </div>
@@ -1448,13 +1466,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-[#E5E5F7] dark:bg-slate-800/60 border-b border-slate-300 dark:border-slate-700">
+                <tr className="bg-[#E5E5F7] dark:bg-slate-800/90 border-b border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100">
                   <td className="p-1.5 font-bold">1</td>
                   <td className="p-1.5">
                     <select
                       value={paymentLabel}
                       onChange={(e) => setPaymentLabel(e.target.value)}
-                      className="justi-select w-64 font-semibold"
+                      className="justi-select w-64 font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                     >
                       {JUSTI_PAYMENT_METHODS.map((m) => (
                         <option key={m.label} value={m.label}>
@@ -1468,7 +1486,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       type="text"
                       readOnly
                       value={totals.grossPesos.toFixed(2)}
-                      className="justi-input w-28 text-right font-bold"
+                      className="justi-input w-28 text-right font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                     />
                   </td>
                   <td className="p-1.5 text-xs">
@@ -1480,7 +1498,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                         <select
                           value={selectedCardPlan}
                           onChange={(e) => setSelectedCardPlan(e.target.value)}
-                          className="justi-select text-xs font-semibold w-full max-w-sm"
+                          className="justi-select text-xs font-semibold w-full max-w-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                         >
                           {JUSTI_CARD_PLANS.map((plan) => (
                             <option key={plan} value={plan}>
@@ -1502,7 +1520,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       type="text"
                       readOnly
                       value={activeDiscountPercent.toFixed(2)}
-                      className="justi-input w-16 text-right"
+                      className="justi-input w-16 text-right bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 dark:border-slate-700"
                     />
                   </td>
                   <td className="p-1.5 text-right font-mono">
@@ -1510,13 +1528,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       type="text"
                       readOnly
                       value={totals.finalTotalPesos.toFixed(2)}
-                      className="justi-input w-28 text-right font-extrabold text-[#1B5E91] dark:text-sky-300"
+                      className="justi-input w-28 text-right font-extrabold text-[#1B5E91] dark:text-sky-300 bg-white dark:bg-slate-900 dark:border-slate-700"
                     />
                   </td>
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="bg-[#DCEAF7] font-bold text-[#1B5E91]">
+                <tr className="bg-[#DCEAF7] dark:bg-slate-900 font-bold text-[#1B5E91] dark:text-sky-300">
                   <td colSpan={2} className="p-2">
                     TOTALES
                   </td>
@@ -1538,14 +1556,14 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
         {/* Observaciones Generales */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
             Observaciones:
           </label>
           <textarea
             rows={2}
             value={generalObservations}
             onChange={(e) => setGeneralObservations(e.target.value)}
-            className="justi-input w-full"
+            className="justi-input w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 dark:border-slate-700"
           />
         </div>
 
