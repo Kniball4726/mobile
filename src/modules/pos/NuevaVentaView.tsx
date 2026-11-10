@@ -31,6 +31,7 @@ interface NuevaVentaViewProps {
   onOpenCajaQuick: () => void;
   onGoToClientes: () => void;
   onSaleCompleted: (amountPesos: number) => void;
+  onCancel?: () => void;
 }
 
 const JUSTI_PAYMENT_METHODS: Array<{
@@ -66,6 +67,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   onOpenCajaQuick,
   onGoToClientes,
   onSaleCompleted,
+  onCancel,
 }) => {
   const defaultCustomerLabel = `${user.fullName || 'Operador'} (Consumidor Final)`;
 
@@ -372,7 +374,18 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-44px)] bg-[#F7FBFF] pb-16 sm:pb-4">
-      <div className="justi-title-strip">Nueva Venta</div>
+      <div className="justi-title-strip flex items-center justify-between px-3 sm:px-4">
+        <span>Nueva Venta</span>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-xs font-bold text-[#1B5E91] dark:text-sky-300 hover:underline flex items-center gap-1"
+          >
+            ← Cancelar y Volver
+          </button>
+        )}
+      </div>
 
       <div className="p-2 sm:p-4 space-y-3 flex-1 max-w-[1440px] w-full mx-auto">
         {!isCajaOpen && (
@@ -1223,8 +1236,13 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
               onClick={() => {
                 setCart([]);
                 setError(null);
+                setSelectedCustomer(null);
+                setCustomerSearch(defaultCustomerLabel);
+                if (onCancel) {
+                  onCancel();
+                }
               }}
-              className="justi-btn-primary py-2.5 sm:py-1.5 px-5 text-sm sm:text-xs"
+              className="justi-btn-primary py-2.5 sm:py-1.5 px-5 text-sm sm:text-xs font-bold"
             >
               Cancelar
             </button>

@@ -375,6 +375,7 @@ export const App: React.FC = () => {
             }}
             onGoToClientes={() => setActiveScreen('CLIENTES')}
             onSaleCompleted={handleSaleCompleted}
+            onCancel={() => handleNavigate('BIENVENIDO')}
           />
         )}
 
