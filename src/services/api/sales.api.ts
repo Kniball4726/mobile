@@ -9,9 +9,11 @@ export const SalesApi = {
         productId: string;
         quantity: number;
         customPriceCents?: number;
+        discountPercentage?: number;
       }>;
       customerId?: string | null;
       applyCustomerDiscount: boolean;
+      discountPercentage?: number;
     },
   ): Promise<SalePreviewResponse> {
     return request<SalePreviewResponse>(
@@ -32,9 +34,11 @@ export const SalesApi = {
         productId: string;
         quantity: number;
         customPriceCents?: number;
+        discountPercentage?: number;
       }>;
       customerId?: string | null;
       applyCustomerDiscount: boolean;
+      discountPercentage?: number;
       payments: Array<{
         method: 'CASH' | 'CARD' | 'TRANSFER';
         amountCents: number;

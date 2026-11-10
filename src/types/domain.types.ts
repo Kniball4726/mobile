@@ -101,6 +101,8 @@ export interface CartItem {
   quantity: number;
   observations?: string;
   customPrice?: number;
+  discountPercent?: number;
+  discountInput?: string;
 }
 
 export interface SalePreviewResponse {

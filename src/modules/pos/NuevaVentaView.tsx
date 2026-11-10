@@ -96,6 +96,8 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     JUSTI_CARD_PLANS[0],
   );
   const [generalObservations, setGeneralObservations] = useState('');
+  const [generalDiscountPercent, setGeneralDiscountPercent] = useState<number>(0);
+  const [generalDiscountInput, setGeneralDiscountInput] = useState<string>('');
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,6 +117,26 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       setCustomerSearch(defaultCustomerLabel);
     }
   }, [preselectedCustomer, consumidorFinalMode, defaultCustomerLabel]);
+
+  useEffect(() => {
+    if (
+      selectedCustomer &&
+      selectedCustomer.activeDiscount?.isAvailable &&
+      selectedCustomer.activeDiscount.percentage > 0 &&
+      applyCrmDiscount
+    ) {
+      const crmPct = selectedCustomer.activeDiscount.percentage;
+      setGeneralDiscountPercent(crmPct);
+      setGeneralDiscountInput(`-${crmPct}`);
+      setCart((prev) =>
+        prev.map((item) => ({
+          ...item,
+          discountPercent:
+            item.discountPercent !== undefined ? item.discountPercent : crmPct,
+        })),
+      );
+    }
+  }, [selectedCustomer, applyCrmDiscount]);
 
   useEffect(() => {
     if (
@@ -144,23 +166,34 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
     return map;
   }, [categories]);
 
-  const addProductToCart = useCallback((product: ProductItem) => {
-    setError(null);
-    setLastReceipt(null);
-    setCart((prev) => {
-      const idx = prev.findIndex((item) => item.product._id === product._id);
-      if (idx >= 0) {
-        const updated = [...prev];
-        updated[idx] = {
-          ...updated[idx],
-          quantity: updated[idx].quantity + 1,
-        };
-        return updated;
-      }
-      return [...prev, { product, quantity: 1, customPrice: product.price }];
-    });
-    setCodeSearch('');
-  }, []);
+  const addProductToCart = useCallback(
+    (product: ProductItem) => {
+      setError(null);
+      setLastReceipt(null);
+      setCart((prev) => {
+        const idx = prev.findIndex((item) => item.product._id === product._id);
+        if (idx >= 0) {
+          const updated = [...prev];
+          updated[idx] = {
+            ...updated[idx],
+            quantity: updated[idx].quantity + 1,
+          };
+          return updated;
+        }
+        return [
+          ...prev,
+          {
+            product,
+            quantity: 1,
+            customPrice: product.price,
+            discountPercent: generalDiscountPercent,
+          },
+        ];
+      });
+      setCodeSearch('');
+    },
+    [generalDiscountPercent],
+  );
 
   const handleBarcodeOrSkuLookup = useCallback(
     async (rawCode: string) => {
@@ -211,32 +244,120 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
   }, [codeSearch, products]);
 
   const activeDiscountPercent = useMemo(() => {
-    if (
-      selectedCustomer &&
-      selectedCustomer.activeDiscount?.isAvailable &&
-      selectedCustomer.activeDiscount.percentage > 0 &&
-      applyCrmDiscount
-    ) {
-      return selectedCustomer.activeDiscount.percentage;
+    return generalDiscountPercent;
+  }, [generalDiscountPercent]);
+
+  const parseDiscountInput = (val: string): number => {
+    const clean = val.trim();
+    if (!clean || clean === '-' || clean === '+') return 0;
+    if (clean.startsWith('+')) {
+      const num = parseFloat(clean.slice(1));
+      return isNaN(num) ? 0 : -num; // recargo como descuento negativo
     }
-    return 0;
-  }, [selectedCustomer, applyCrmDiscount]);
+    if (clean.startsWith('-')) {
+      const num = parseFloat(clean.slice(1));
+      return isNaN(num) ? 0 : Math.min(100, Math.max(0, num));
+    }
+    const num = parseFloat(clean);
+    if (isNaN(num)) return 0;
+    return Math.min(100, Math.max(0, num));
+  };
+
+  const updateItemDiscount = (productId: string, discount: number) => {
+    const valid = Math.min(100, Math.max(-100, discount));
+    setCart((prev) =>
+      prev.map((i) =>
+        i.product._id === productId
+          ? { ...i, discountPercent: valid, discountInput: undefined }
+          : i,
+      ),
+    );
+  };
+
+  const updateItemDiscountRaw = (productId: string, raw: string) => {
+    const parsed = parseDiscountInput(raw);
+    setCart((prev) =>
+      prev.map((i) =>
+        i.product._id === productId
+          ? { ...i, discountPercent: parsed, discountInput: raw }
+          : i,
+      ),
+    );
+  };
+
+  const finalizeItemDiscount = (productId: string) => {
+    setCart((prev) =>
+      prev.map((i) => {
+        if (i.product._id !== productId) return i;
+        const parsed =
+          i.discountInput !== undefined
+            ? parseDiscountInput(i.discountInput)
+            : i.discountPercent ?? generalDiscountPercent;
+        return {
+          ...i,
+          discountPercent: parsed,
+          discountInput: undefined,
+        };
+      }),
+    );
+  };
+
+  const applyGeneralDiscount = (pct: number) => {
+    const valid = Math.min(100, Math.max(-100, pct));
+    setGeneralDiscountPercent(valid);
+    setGeneralDiscountInput(
+      valid !== 0 ? (valid > 0 ? `-${valid}` : `+${Math.abs(valid)}`) : '',
+    );
+    setCart((prev) =>
+      prev.map((item) => ({
+        ...item,
+        discountPercent: valid,
+        discountInput: undefined,
+      })),
+    );
+  };
+
+  const handleGeneralDiscountInputChange = (val: string) => {
+    setGeneralDiscountInput(val);
+    const parsed = parseDiscountInput(val);
+    setGeneralDiscountPercent(parsed);
+    setCart((prev) =>
+      prev.map((item) => ({
+        ...item,
+        discountPercent: parsed,
+        discountInput: undefined,
+      })),
+    );
+  };
 
   const totals = useMemo(() => {
-    const grossPesos = cart.reduce((acc, item) => {
-      const price =
+    let grossPesos = 0;
+    let discountPesos = 0;
+    let finalTotalPesos = 0;
+
+    cart.forEach((item) => {
+      const basePrice =
         typeof item.customPrice === 'number'
           ? item.customPrice
           : item.product.price;
-      return acc + price * item.quantity;
-    }, 0);
-    const discountPesos = Number(
-      ((grossPesos * activeDiscountPercent) / 100).toFixed(2),
-    );
-    const finalTotalPesos = Math.max(
-      0,
-      Number((grossPesos - discountPesos).toFixed(2)),
-    );
+      const descPercent =
+        typeof item.discountPercent === 'number'
+          ? item.discountPercent
+          : generalDiscountPercent;
+      const priceWithDesc = Number(
+        (basePrice * (1 - descPercent / 100)).toFixed(2),
+      );
+      const lineTotal = Number((priceWithDesc * item.quantity).toFixed(2));
+
+      grossPesos += basePrice * item.quantity;
+      discountPesos += (basePrice - priceWithDesc) * item.quantity;
+      finalTotalPesos += lineTotal;
+    });
+
+    grossPesos = Number(grossPesos.toFixed(2));
+    discountPesos = Number(discountPesos.toFixed(2));
+    finalTotalPesos = Math.max(0, Number(finalTotalPesos.toFixed(2)));
+
     const netWithoutTax = Number((finalTotalPesos / 1.21).toFixed(2));
     const ivaAmount = Number((finalTotalPesos - netWithoutTax).toFixed(2));
 
@@ -247,7 +368,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       ivaAmount,
       finalTotalPesos,
     };
-  }, [cart, activeDiscountPercent]);
+  }, [cart, generalDiscountPercent]);
 
   const updateQuantity = (productId: string, newQty: number) => {
     if (newQty <= 0) {
@@ -302,14 +423,22 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
         .slice(2, 8)}`;
 
       const preview = await SalesApi.previewSale(token, {
-        items: cart.map((item) => ({
-          productId: item.product._id,
-          quantity: item.quantity,
-          customPriceCents:
+        items: cart.map((item) => {
+          const basePrice =
             typeof item.customPrice === 'number'
-              ? Math.round(item.customPrice * 100)
-              : undefined,
-        })),
+              ? item.customPrice
+              : item.product.price;
+          const descPercent =
+            typeof item.discountPercent === 'number'
+              ? item.discountPercent
+              : generalDiscountPercent;
+          return {
+            productId: item.product._id,
+            quantity: item.quantity,
+            customPriceCents: Math.round(basePrice * 100),
+            discountPercentage: descPercent > 0 ? descPercent : undefined,
+          };
+        }),
         customerId: selectedCustomer ? selectedCustomer._id : null,
         applyCustomerDiscount: Boolean(
           selectedCustomer &&
@@ -332,14 +461,22 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
       }
 
       const response = await SalesApi.createSale(token, idempotencyKey, {
-        items: cart.map((item) => ({
-          productId: item.product._id,
-          quantity: item.quantity,
-          customPriceCents:
+        items: cart.map((item) => {
+          const basePrice =
             typeof item.customPrice === 'number'
-              ? Math.round(item.customPrice * 100)
-              : undefined,
-        })),
+              ? item.customPrice
+              : item.product.price;
+          const descPercent =
+            typeof item.discountPercent === 'number'
+              ? item.discountPercent
+              : generalDiscountPercent;
+          return {
+            productId: item.product._id,
+            quantity: item.quantity,
+            customPriceCents: Math.round(basePrice * 100),
+            discountPercentage: descPercent > 0 ? descPercent : undefined,
+          };
+        }),
         customerId: selectedCustomer ? selectedCustomer._id : null,
         applyCustomerDiscount: Boolean(
           selectedCustomer &&
@@ -769,8 +906,12 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   typeof item.customPrice === 'number'
                     ? item.customPrice
                     : item.product.price;
+                const descPercent =
+                  typeof item.discountPercent === 'number'
+                    ? item.discountPercent
+                    : generalDiscountPercent;
                 const priceWithDesc = Number(
-                  (unitPrice * (1 - activeDiscountPercent / 100)).toFixed(2),
+                  (unitPrice * (1 - descPercent / 100)).toFixed(2),
                 );
                 const lineTotal = Number(
                   (priceWithDesc * item.quantity).toFixed(2),
@@ -844,13 +985,60 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       </div>
                     </div>
 
+                    {/* Modificación de Descuento por Ítem Móvil */}
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2 rounded border border-slate-200">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[11px] font-bold text-[#1B5E91]">
+                          Desc/Rec:
+                        </span>
+                        <input
+                          type="text"
+                          value={
+                            item.discountInput !== undefined
+                              ? item.discountInput
+                              : descPercent !== 0
+                              ? descPercent > 0
+                                ? `-${descPercent}`
+                                : `+${Math.abs(descPercent)}`
+                              : ''
+                          }
+                          onChange={(e) =>
+                            updateItemDiscountRaw(
+                              item.product._id,
+                              e.target.value,
+                            )
+                          }
+                          onBlur={() => finalizeItemDiscount(item.product._id)}
+                          placeholder="-0%"
+                          className="justi-input w-20 text-right font-mono font-bold py-1 px-1.5 text-xs text-emerald-800 focus:bg-emerald-50"
+                        />
+                        <span className="text-[10px] font-bold text-emerald-800">
+                          %
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {[0, 5, 10, 15].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() =>
+                              updateItemDiscount(item.product._id, pct)
+                            }
+                            className={`px-1.5 py-0.5 text-[10px] rounded font-bold transition-colors ${
+                              descPercent === pct
+                                ? 'bg-emerald-700 text-white'
+                                : 'bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50'
+                            }`}
+                          >
+                            {pct === 0 ? '0%' : `-${pct}%`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="mt-1 flex items-center justify-between text-xs border-t border-slate-100 pt-1.5">
-                      <div className="text-[11px] text-slate-500">
-                        {activeDiscountPercent > 0 && (
-                          <span className="font-bold text-emerald-700">
-                            Desc: -{activeDiscountPercent}%
-                          </span>
-                        )}
+                      <div className="text-[11px] text-slate-500 font-mono">
+                        Neto: ${priceWithDesc.toFixed(2)} c/u
                       </div>
                       <div className="text-sm font-extrabold text-[#1B5E91]">
                         Subtotal: ${lineTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -879,7 +1067,7 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                   <th className="py-2 px-2 text-right min-w-[130px]">
                     Precio (Con Impuestos)
                   </th>
-                  <th className="py-2 px-2 text-right">Desc/Rec (%)</th>
+                  <th className="py-2 px-2 text-right min-w-[140px]">Desc/Rec (%)</th>
                   <th className="py-2 px-2 text-right">
                     Precio Con Desc/Rec
                   </th>
@@ -911,7 +1099,10 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                       typeof item.customPrice === 'number'
                         ? item.customPrice
                         : item.product.price;
-                    const descPercent = activeDiscountPercent;
+                    const descPercent =
+                      typeof item.discountPercent === 'number'
+                        ? item.discountPercent
+                        : generalDiscountPercent;
                     const priceWithDesc = Number(
                       (unitPrice * (1 - descPercent / 100)).toFixed(2),
                     );
@@ -978,12 +1169,58 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                             />
                           </div>
                         </td>
-                        <td className="p-1.5 text-right font-mono font-bold text-emerald-800 bg-white/80">
-                          {descPercent > 0
-                            ? `-${descPercent.toFixed(2)}`
-                            : '0.00'}
+                        <td className="p-1.5 text-right font-mono bg-white/80">
+                          <div className="flex flex-col items-end gap-1">
+                            <div className="flex items-center justify-end gap-1">
+                              <input
+                                type="text"
+                                value={
+                                  item.discountInput !== undefined
+                                    ? item.discountInput
+                                    : descPercent !== 0
+                                    ? descPercent > 0
+                                      ? `-${descPercent}`
+                                      : `+${Math.abs(descPercent)}`
+                                    : ''
+                                }
+                                onChange={(e) =>
+                                  updateItemDiscountRaw(
+                                    item.product._id,
+                                    e.target.value,
+                                  )
+                                }
+                                onBlur={() =>
+                                  finalizeItemDiscount(item.product._id)
+                                }
+                                placeholder="-0%"
+                                className="justi-input w-20 text-right font-mono font-bold py-1 px-1.5 text-xs text-emerald-800 focus:bg-emerald-50"
+                                title="Descuento (ej. -15 o 15) o recargo (+10)"
+                              />
+                              <span className="text-[10px] font-bold text-emerald-800">
+                                %
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-0.5">
+                              {[0, 5, 10, 15].map((pct) => (
+                                <button
+                                  key={pct}
+                                  type="button"
+                                  onClick={() =>
+                                    updateItemDiscount(item.product._id, pct)
+                                  }
+                                  className={`px-1 py-0.5 text-[9px] rounded font-bold transition-colors ${
+                                    descPercent === pct
+                                      ? 'bg-emerald-700 text-white'
+                                      : 'bg-slate-200 text-slate-700 hover:bg-emerald-100'
+                                  }`}
+                                >
+                                  {pct === 0 ? '0%' : `-${pct}%`}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         </td>
-                        <td className="p-1.5 text-right font-mono bg-slate-200">
+                        <td className="p-1.5 text-right font-mono font-semibold text-slate-900 bg-slate-200">
                           {priceWithDesc.toFixed(2)}
                         </td>
                         <td className="p-1.5 text-right font-mono bg-slate-200">
@@ -1013,6 +1250,54 @@ export const NuevaVentaView: React.FC<NuevaVentaViewProps> = ({
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Barra de Descuento General de la Venta (Opción B) */}
+          <div className="p-2.5 bg-gradient-to-r from-[#DCEAF7] via-[#E8F2FC] to-[#DCEAF7] border-y border-[#9CC2E5] flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-[#1B5E91] text-xs uppercase tracking-wide">
+                Descuento General Venta:
+              </span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="text"
+                  value={generalDiscountInput}
+                  onChange={(e) =>
+                    handleGeneralDiscountInputChange(e.target.value)
+                  }
+                  placeholder="-0%"
+                  className="justi-input w-24 text-right font-mono font-bold py-1 px-2 text-xs text-emerald-800 focus:bg-emerald-50"
+                  title="Ej: -15 o 15 para 15% de descuento, +10 para 10% de recargo"
+                />
+                <span className="font-bold text-emerald-800 text-xs">%</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] font-semibold text-slate-600 mr-1">
+                Accesos rápidos:
+              </span>
+              {[
+                { label: 'Sin desc.', val: 0 },
+                { label: '-5%', val: 5 },
+                { label: '-10%', val: 10 },
+                { label: '-15%', val: 15 },
+                { label: '-20%', val: 20 },
+              ].map((btn) => (
+                <button
+                  key={btn.val}
+                  type="button"
+                  onClick={() => applyGeneralDiscount(btn.val)}
+                  className={`px-2.5 py-1 text-xs rounded font-bold transition-all ${
+                    generalDiscountPercent === btn.val
+                      ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-800'
+                      : 'bg-white text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Franja Azul de Totales (#80AED8) */}
