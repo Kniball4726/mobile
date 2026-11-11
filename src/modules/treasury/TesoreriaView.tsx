@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JustiFooter } from '../../components/JustiFooter';
 import { TreasuryApi } from '../../services/api/treasury.api';
 import {
@@ -33,6 +33,8 @@ interface TesoreriaViewProps {
   onRegisterOperation: (
     op: Omit<CashOperationRecord, 'id' | 'createdAt'>,
   ) => void;
+  autoOpenCloseRegisterId?: string | null;
+  onClearAutoOpenClose?: () => void;
 }
 
 export const TesoreriaView: React.FC<TesoreriaViewProps> = ({
@@ -45,6 +47,8 @@ export const TesoreriaView: React.FC<TesoreriaViewProps> = ({
   onOpenRegister,
   onCloseRegister,
   onRegisterOperation,
+  autoOpenCloseRegisterId,
+  onClearAutoOpenClose,
 }) => {
   const assignedBranch: BranchType = user.branch || 'LOCALES';
   const isBranchLocked = user.role !== 'ADMIN' && user.role !== 'MASTER';
@@ -120,6 +124,16 @@ export const TesoreriaView: React.FC<TesoreriaViewProps> = ({
       setDeclaredCashInput(reg.currentBalance.toFixed(2));
     }
   };
+
+  useEffect(() => {
+    if (autoOpenCloseRegisterId && registers.length > 0) {
+      const target = registers.find((r) => r.id === autoOpenCloseRegisterId);
+      if (target && target.status === 'ABIERTA') {
+        handleOpenCloseModal(target);
+      }
+      onClearAutoOpenClose?.();
+    }
+  }, [autoOpenCloseRegisterId, registers]);
 
   const handleViewSummaryModal = async (reg: CashRegisterRecord) => {
     setSelectedRegisterForSummary(reg);

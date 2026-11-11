@@ -39,6 +39,7 @@ export const App: React.FC = () => {
 
   const [tesoreriaTab, setTesoreriaTab] = useState<TesoreriaTab>('CAJAS');
   const [masterTab, setMasterTab] = useState<MasterTab>('EMPRESAS');
+  const [autoCloseRegisterId, setAutoCloseRegisterId] = useState<string | null>(null);
   const [consumidorFinalMode, setConsumidorFinalMode] =
     useState<boolean>(false);
   const [selectedCustomerForSale, setSelectedCustomerForSale] =
@@ -192,6 +193,18 @@ export const App: React.FC = () => {
     }
     return true;
   });
+
+  const activeCashierRegister = registers.find((r) => {
+    if (r.status !== 'ABIERTA' || r.boxType !== 'Ventas Sucursal') return false;
+    if (session?.user.role === 'CASHIER') {
+      return (
+        !r.userId ||
+        r.userId === session.user.id ||
+        r.userFullName === session.user.fullName
+      );
+    }
+    return true;
+  }) || null;
 
   const handleOpenRegister = async (
     boxType: 'Ventas Sucursal' | 'Caja Consolidada',
@@ -354,7 +367,19 @@ export const App: React.FC = () => {
               onNavigate={handleNavigate}
             />
           ) : (
-            <HomeView user={session.user} onNavigate={handleNavigate} />
+            <HomeView
+              user={session.user}
+              onNavigate={handleNavigate}
+              isCajaOpen={isVentasSucursalOpen}
+              activeRegister={activeCashierRegister}
+              onOpenCaja={() => handleNavigate('APERTURA_CAJA', 'ABRIR_CAJA')}
+              onCloseCaja={() => {
+                if (activeCashierRegister) {
+                  setAutoCloseRegisterId(activeCashierRegister.id);
+                }
+                handleNavigate('APERTURA_CAJA', 'CAJAS');
+              }}
+            />
           )
         )}
 
@@ -435,6 +460,8 @@ export const App: React.FC = () => {
               onOpenRegister={handleOpenRegister}
               onCloseRegister={handleCloseRegister}
               onRegisterOperation={handleRegisterOperation}
+              autoOpenCloseRegisterId={autoCloseRegisterId}
+              onClearAutoOpenClose={() => setAutoCloseRegisterId(null)}
             />
           )}
 
