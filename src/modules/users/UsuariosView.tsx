@@ -29,7 +29,9 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
   // Multi-Tenant / Empresas
   const [companies, setCompanies] = useState<CompanyRecord[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
-  const [companyFilter, setCompanyFilter] = useState<string>('');
+  const [companyFilter, setCompanyFilter] = useState<string>(() => {
+    return localStorage.getItem('justi_master_active_company') || '';
+  });
 
   const loadCompanies = useCallback(async () => {
     if (currentUserRole !== 'MASTER') return;
@@ -72,6 +74,21 @@ export const UsuariosView: React.FC<UsuariosViewProps> = ({
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
+
+  useEffect(() => {
+    const handleCompanyChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ companyId: string }>;
+      const compId = customEvent.detail?.companyId || '';
+      setCompanyFilter(compId);
+      if (compId) {
+        setSelectedCompanyId(compId);
+      }
+    };
+    window.addEventListener('justi:company-changed', handleCompanyChange);
+    return () => {
+      window.removeEventListener('justi:company-changed', handleCompanyChange);
+    };
+  }, []);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();

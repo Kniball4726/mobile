@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActiveScreen,
+  CompanyRecord,
   MasterTab,
   TesoreriaTab,
   UserProfile,
@@ -18,12 +19,15 @@ import {
   Tag,
   UserCheck,
   ShieldAlert,
+  ShieldCheck,
   Building2,
   LogOut,
   Sun,
   Moon,
   LineChart,
   Layers,
+  Globe,
+  ChevronDown,
 } from 'lucide-react';
 import { useBranding } from '../../context/BrandingContext';
 
@@ -33,6 +37,9 @@ interface NavigationDrawerProps {
   activeScreen: ActiveScreen;
   isCajaOpen: boolean;
   isDark?: boolean;
+  companies?: CompanyRecord[];
+  selectedCompanyId?: string;
+  onSelectCompany?: (companyId: string) => void;
   onToggleDarkMode?: () => void;
   onClose: () => void;
   onNavigate: (screen: ActiveScreen, tab?: TesoreriaTab | MasterTab) => void;
@@ -45,6 +52,9 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   activeScreen,
   isCajaOpen,
   isDark = false,
+  companies = [],
+  selectedCompanyId = '',
+  onSelectCompany,
   onToggleDarkMode,
   onClose,
   onNavigate,
@@ -83,12 +93,17 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <img
-                  src={branding.logoUrl || '/justi-logo.svg'}
-                  alt={branding.companyName || 'Logo'}
+                  src={isMaster ? '/justi-logo.svg' : (branding.logoUrl || '/justi-logo.svg')}
+                  alt={isMaster ? 'JustiMobile Master' : (branding.companyName || 'Logo')}
                   className="h-8 w-8 object-contain drop-shadow"
                 />
-                <span className="text-lg font-black tracking-tight flex items-center">
-                  {branding.companyName || 'JustiMobile POS'}
+                <span className="text-lg font-black tracking-tight flex items-center gap-1.5">
+                  <span>{isMaster ? 'JustiMobile Master' : (branding.companyName || 'JustiMobile POS')}</span>
+                  {isMaster && (
+                    <span className="rounded bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.5 tracking-wider uppercase shadow-xs">
+                      SaaS
+                    </span>
+                  )}
                 </span>
               </div>
               <button
@@ -111,20 +126,57 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 <span className="rounded bg-white dark:bg-slate-700 px-1.5 py-0.5 font-extrabold text-[#1B5E91] dark:text-blue-300">
                   {user.role}
                 </span>
-                <span className="rounded bg-emerald-400/90 text-slate-900 px-1.5 py-0.5 font-bold flex items-center gap-1">
-                  <Building2 className="h-3 w-3" />
-                  {user.branch || 'LOCALES'}
-                </span>
-                <span
-                  className={`rounded px-1.5 py-0.5 font-bold ${
-                    isCajaOpen
-                      ? 'bg-emerald-200 text-emerald-950'
-                      : 'bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-slate-300'
-                  }`}
-                >
-                  {isCajaOpen ? 'Caja Abierta' : 'Caja Cerrada'}
-                </span>
+                {isMaster ? (
+                  <span className="rounded bg-amber-400 text-slate-900 px-2 py-0.5 font-extrabold flex items-center gap-1 shadow-xs">
+                    <ShieldCheck className="h-3 w-3" />
+                    GOBERNANZA SAAS
+                  </span>
+                ) : (
+                  <>
+                    <span className="rounded bg-emerald-400/90 text-slate-900 px-1.5 py-0.5 font-bold flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      {user.branch || 'LOCALES'}
+                    </span>
+                    <span
+                      className={`rounded px-1.5 py-0.5 font-bold ${
+                        isCajaOpen
+                          ? 'bg-emerald-200 text-emerald-950'
+                          : 'bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      {isCajaOpen ? 'Caja Abierta' : 'Caja Cerrada'}
+                    </span>
+                  </>
+                )}
               </div>
+
+              {/* Selector Rápido de Empresa para MASTER en Móvil */}
+              {isMaster && (
+                <div className="mt-2.5 pt-2 border-t border-white/20 dark:border-slate-700">
+                  <label className="text-[10px] font-bold text-white/90 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1 mb-1">
+                    <Globe className="h-3 w-3 text-amber-300" />
+                    <span>Contexto de Empresa</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedCompanyId}
+                      onChange={(e) => onSelectCompany?.(e.target.value)}
+                      className="w-full text-xs font-semibold py-1.5 pl-2.5 pr-7 rounded bg-white/20 dark:bg-slate-800 text-white border border-white/30 dark:border-slate-600 focus:outline-hidden focus:ring-1 focus:ring-amber-300 transition cursor-pointer appearance-none truncate"
+                      title="Contexto de Empresa / Tenant"
+                    >
+                      <option value="" className="bg-[#1B5E91] text-white">
+                        🌐 Vista Global (Todas las Empresas)
+                      </option>
+                      {companies.map((c) => (
+                        <option key={c._id} value={c._id} className="bg-slate-800 text-white">
+                          🏢 {c.name} ({c.cuitFormatted || c.cuit})
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-2 h-3.5 w-3.5 text-white/70 pointer-events-none" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

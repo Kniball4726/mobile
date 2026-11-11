@@ -45,9 +45,15 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
               <span className="rounded bg-[#D9ECFB] dark:bg-slate-700 px-1.5 py-0.5 text-[10px] font-bold text-[#1B5E91] dark:text-blue-300">
                 Rol: {user.role}
               </span>
-              <span className="rounded bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
-                {user.branch || 'LOCALES'}
-              </span>
+              {user.role === 'MASTER' ? (
+                <span className="rounded bg-amber-400 text-slate-900 px-1.5 py-0.5 text-[10px] font-extrabold shadow-xs">
+                  GOBERNANZA SAAS
+                </span>
+              ) : (
+                <span className="rounded bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                  {user.branch || 'LOCALES'}
+                </span>
+              )}
             </div>
           </div>
           <button

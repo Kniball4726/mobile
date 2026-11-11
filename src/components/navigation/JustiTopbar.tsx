@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ActiveScreen,
+  CompanyRecord,
   MasterTab,
   TesoreriaTab,
   UserProfile,
@@ -9,6 +10,7 @@ import {
   Menu,
   ChevronDown,
   ShieldAlert,
+  ShieldCheck,
   Wifi,
   WifiOff,
   RefreshCw,
@@ -20,7 +22,9 @@ import {
   Building2,
   Layers,
   FileText,
+  Globe,
 } from 'lucide-react';
+import { MasterApi } from '../../services/api/master.api';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useBranding } from '../../context/BrandingContext';
 import { NavigationDrawer } from './NavigationDrawer';
@@ -84,6 +88,37 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
   const canOperateCash = user.role === 'CASHIER';
   const isAdmin = user.role === 'ADMIN';
 
+  const [companies, setCompanies] = useState<CompanyRecord[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(() => {
+    return localStorage.getItem('justi_master_active_company') || '';
+  });
+
+  useEffect(() => {
+    if (isMaster && token) {
+      MasterApi.listCompanies(token)
+        .then((data) => {
+          setCompanies(Array.isArray(data) ? data : []);
+        })
+        .catch((err) => {
+          console.warn('Error al cargar lista de empresas en topbar:', err);
+        });
+    }
+  }, [isMaster, token]);
+
+  const handleSelectCompany = (companyId: string) => {
+    setSelectedCompanyId(companyId);
+    if (companyId) {
+      localStorage.setItem('justi_master_active_company', companyId);
+    } else {
+      localStorage.removeItem('justi_master_active_company');
+    }
+    window.dispatchEvent(
+      new CustomEvent('justi:company-changed', {
+        detail: { companyId },
+      }),
+    );
+  };
+
   return (
     <>
       {/* BARRA SUPERIOR (HEADER) */}
@@ -105,7 +140,7 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
               <Menu className="h-5 w-5" />
             </button>
 
-            {/* Logo de la Marca */}
+            {/* Logo de la Marca / Consola Master */}
             <button
               type="button"
               onClick={() => {
@@ -113,17 +148,51 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
                 onNavigate('BIENVENIDO');
               }}
               className="flex items-center gap-2 rounded px-1.5 py-0.5 hover:bg-white/10 transition-colors"
-              title={`Ir a Inicio - ${branding.companyName || 'JustiMobile POS'}`}
+              title={
+                isMaster
+                  ? 'Ir a Inicio - JustiMobile Master'
+                  : `Ir a Inicio - ${branding.companyName || 'JustiMobile POS'}`
+              }
             >
               <img
-                src={branding.logoUrl || '/justi-logo.svg'}
-                alt={branding.companyName || 'Logo'}
+                src={isMaster ? '/justi-logo.svg' : branding.logoUrl || '/justi-logo.svg'}
+                alt={isMaster ? 'JustiMobile Master' : branding.companyName || 'Logo'}
                 className="h-7 w-7 object-contain drop-shadow-sm"
               />
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center">
-                {branding.companyName || 'JustiMobile POS'}
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white drop-shadow-sm flex items-center gap-1.5">
+                <span>{isMaster ? 'JustiMobile Master' : branding.companyName || 'JustiMobile POS'}</span>
+                {isMaster && (
+                  <span className="hidden xl:inline-block rounded bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.5 tracking-wider uppercase shadow-xs">
+                    SaaS
+                  </span>
+                )}
               </span>
             </button>
+
+            {/* Selector Rápido de Empresa (Tenant Switcher) para MASTER */}
+            {isMaster && (
+              <div className="hidden sm:flex items-center ml-1 lg:ml-2">
+                <div className="relative flex items-center">
+                  <Globe className="absolute left-2 h-3.5 w-3.5 text-blue-200 pointer-events-none" />
+                  <select
+                    value={selectedCompanyId}
+                    onChange={(e) => handleSelectCompany(e.target.value)}
+                    className="text-xs font-semibold pl-6.5 pr-7 py-1 rounded bg-white/15 hover:bg-white/25 focus:bg-[#154670] focus:ring-1 focus:ring-amber-300 text-white border border-white/25 transition cursor-pointer appearance-none shadow-xs max-w-[190px] lg:max-w-[240px] truncate"
+                    title="Contexto de Empresa / Tenant"
+                  >
+                    <option value="" className="bg-[#1B5E91] text-white">
+                      🌐 Vista Global (Todas)
+                    </option>
+                    {companies.map((c) => (
+                      <option key={c._id} value={c._id} className="bg-slate-800 text-white">
+                        🏢 {c.name} ({c.cuitFormatted || c.cuit})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-1.5 h-3.5 w-3.5 text-white/70 pointer-events-none" />
+                </div>
+              </div>
+            )}
 
             {/* Acceso Rápido Horizontal Desktop (>= md) */}
             <div className="hidden md:flex items-center gap-1 ml-1">
@@ -478,9 +547,11 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
               ) : (
                 <WifiOff className="h-3 w-3 text-amber-700" />
               )}
-              {isOnline
-                ? `${user.branch || 'LOCALES'} • ONLINE`
-                : `${user.branch || 'LOCALES'} • OFFLINE`}
+              {isMaster
+                ? (isOnline ? 'PLATAFORMA • ONLINE' : 'PLATAFORMA • OFFLINE')
+                : (isOnline
+                    ? `${user.branch || 'LOCALES'} • ONLINE`
+                    : `${user.branch || 'LOCALES'} • OFFLINE`)}
             </span>
 
             {/* Botón Dark Mode Toggle */}
@@ -521,6 +592,9 @@ export const JustiTopbar: React.FC<JustiTopbarProps> = ({
         activeScreen={activeScreen}
         isCajaOpen={isCajaOpen}
         isDark={isDark}
+        companies={companies}
+        selectedCompanyId={selectedCompanyId}
+        onSelectCompany={handleSelectCompany}
         onToggleDarkMode={onToggleDarkMode}
         onClose={() => setIsDrawerOpen(false)}
         onNavigate={onNavigate}

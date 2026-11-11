@@ -173,6 +173,7 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
         const activeCompId =
           targetCompanyId ||
           selectedCompanyId ||
+          localStorage.getItem('justi_master_active_company') ||
           companiesList.find((c: CompanyRecord) => c.isDefault)?._id ||
           companiesList[0]?._id ||
           '';
@@ -238,6 +239,20 @@ export const MasterControlView: React.FC<MasterControlViewProps> = ({
   useEffect(() => {
     loadMasterData();
   }, [loadMasterData]);
+
+  useEffect(() => {
+    const handleCompanyChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ companyId: string }>;
+      const compId = customEvent.detail?.companyId;
+      if (compId) {
+        handleSelectCompanyForIntegrations(compId);
+      }
+    };
+    window.addEventListener('justi:company-changed', handleCompanyChange);
+    return () => {
+      window.removeEventListener('justi:company-changed', handleCompanyChange);
+    };
+  }, [handleSelectCompanyForIntegrations]);
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
