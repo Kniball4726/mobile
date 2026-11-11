@@ -33,8 +33,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const canSell = user.role === 'CASHIER';
   const isAdmin = user.role === 'ADMIN';
 
+  const isLockedForCashier = canSell && !isCajaOpen;
+
   const tileClass =
-    'h-28 sm:h-32 sm:w-36 rounded border border-[#9CC2E5] dark:border-slate-700 bg-gradient-to-b from-[#DCECFB] to-[#C7E0F8] dark:from-slate-800 dark:to-slate-900 p-3 flex flex-col items-center justify-center text-center shadow-sm hover:from-[#CBE3FA] hover:to-[#B4D6F5] dark:hover:from-slate-700 dark:hover:to-slate-800 active:scale-[0.98] transition';
+    'h-28 sm:h-32 sm:w-36 rounded border border-[#9CC2E5] dark:border-slate-700 bg-gradient-to-b from-[#DCECFB] to-[#C7E0F8] dark:from-slate-800 dark:to-slate-900 p-3 flex flex-col items-center justify-center text-center shadow-sm hover:from-[#CBE3FA] hover:to-[#B4D6F5] dark:hover:from-slate-700 dark:hover:to-slate-800 active:scale-[0.98] transition cursor-pointer relative';
+
+  const lockedTileClass =
+    'h-28 sm:h-32 sm:w-36 rounded border border-slate-300 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-800/50 p-3 flex flex-col items-center justify-center text-center shadow-xs opacity-50 cursor-not-allowed select-none relative';
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-44px)] bg-[#F7FBFF] dark:bg-slate-900 pb-16 sm:pb-0 transition-colors">
@@ -102,7 +107,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                     {isCajaOpen
                       ? `Turno de venta activo. Saldo en cajón: $${activeRegister ? activeRegister.currentBalance.toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '0.00'}`
-                      : 'Tu turno aún no ha sido iniciado. Abre caja para comenzar a registrar ventas.'}
+                      : 'Tu turno aún no ha sido iniciado. Por favor, abre caja con la tarjeta principal para habilitar las funciones de venta.'}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 self-start sm:self-auto">
@@ -118,7 +123,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         isCajaOpen ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
                       }`}
                     />
-                    {isCajaOpen ? 'Caja en Operación' : 'Caja Cerrada'}
+                    {isCajaOpen ? 'Caja en Operación' : 'Caja Cerrada (Operaciones Bloqueadas)'}
                   </span>
                 </div>
               </div>
@@ -190,24 +195,76 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <>
                   <button
                     type="button"
-                    onClick={() => onNavigate('NUEVA_VENTA', undefined, true)}
-                    className={tileClass}
+                    disabled={isLockedForCashier}
+                    onClick={() => {
+                      if (!isLockedForCashier) {
+                        onNavigate('NUEVA_VENTA', undefined, true);
+                      }
+                    }}
+                    className={isLockedForCashier ? lockedTileClass : tileClass}
+                    title={
+                      isLockedForCashier
+                        ? 'Debes abrir caja para comenzar a registrar ventas'
+                        : 'Nueva Venta rápida a Consumidor Final'
+                    }
                   >
-                    <span className="text-xs sm:text-[13px] font-bold text-[#1B5E91] dark:text-sky-300 leading-snug">
+                    {isLockedForCashier && (
+                      <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-200/90 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                        <Lock className="h-3 w-3" />
+                      </div>
+                    )}
+                    <span
+                      className={`text-xs sm:text-[13px] font-bold leading-snug ${
+                        isLockedForCashier
+                          ? 'text-slate-500 dark:text-slate-400'
+                          : 'text-[#1B5E91] dark:text-sky-300'
+                      }`}
+                    >
                       Nueva Venta
                       <br />
                       (Consumidor Final)
                     </span>
+                    {isLockedForCashier && (
+                      <span className="mt-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                        <Lock className="h-2.5 w-2.5" /> Requiere Caja
+                      </span>
+                    )}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => onNavigate('NUEVA_VENTA', undefined, false)}
-                    className={tileClass}
+                    disabled={isLockedForCashier}
+                    onClick={() => {
+                      if (!isLockedForCashier) {
+                        onNavigate('NUEVA_VENTA', undefined, false);
+                      }
+                    }}
+                    className={isLockedForCashier ? lockedTileClass : tileClass}
+                    title={
+                      isLockedForCashier
+                        ? 'Debes abrir caja para comenzar a registrar ventas'
+                        : 'Nueva Venta con selección de cliente y factura'
+                    }
                   >
-                    <span className="text-xs sm:text-[13px] font-bold text-[#1B5E91] dark:text-sky-300 leading-snug">
+                    {isLockedForCashier && (
+                      <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-200/90 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                        <Lock className="h-3 w-3" />
+                      </div>
+                    )}
+                    <span
+                      className={`text-xs sm:text-[13px] font-bold leading-snug ${
+                        isLockedForCashier
+                          ? 'text-slate-500 dark:text-slate-400'
+                          : 'text-[#1B5E91] dark:text-sky-300'
+                      }`}
+                    >
                       Nueva Venta
                     </span>
+                    {isLockedForCashier && (
+                      <span className="mt-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                        <Lock className="h-2.5 w-2.5" /> Requiere Caja
+                      </span>
+                    )}
                   </button>
                 </>
               )}
@@ -215,46 +272,142 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {!isCrmOnly && (
               <button
                 type="button"
-                onClick={() => onNavigate('VENTAS_USUARIOS')}
-                className={tileClass}
+                disabled={isLockedForCashier}
+                onClick={() => {
+                  if (!isLockedForCashier) {
+                    onNavigate('VENTAS_USUARIOS');
+                  }
+                }}
+                className={isLockedForCashier ? lockedTileClass : tileClass}
+                title={
+                  isLockedForCashier
+                    ? 'Debes abrir caja para acceder a las ventas del turno'
+                    : 'Consultar historial de ventas POS'
+                }
               >
-                <span className="text-xs sm:text-[13px] font-bold text-[#1B5E91] dark:text-sky-300 leading-snug">
+                {isLockedForCashier && (
+                  <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-200/90 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                    <Lock className="h-3 w-3" />
+                  </div>
+                )}
+                <span
+                  className={`text-xs sm:text-[13px] font-bold leading-snug ${
+                    isLockedForCashier
+                      ? 'text-slate-500 dark:text-slate-400'
+                      : 'text-[#1B5E91] dark:text-sky-300'
+                  }`}
+                >
                   {user.role === 'CASHIER' ? 'Mis Ventas' : 'Ventas por Usuario'}
                   <br />
-                  <span className="text-[11px] font-normal text-[#2D6DA3] dark:text-sky-400/80">
+                  <span
+                    className={`text-[11px] font-normal ${
+                      isLockedForCashier
+                        ? 'text-slate-400 dark:text-slate-500'
+                        : 'text-[#2D6DA3] dark:text-sky-400/80'
+                    }`}
+                  >
                     (Historial POS)
                   </span>
                 </span>
+                {isLockedForCashier && (
+                  <span className="mt-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                    <Lock className="h-2.5 w-2.5" /> Requiere Caja
+                  </span>
+                )}
               </button>
             )}
 
             <button
               type="button"
-              onClick={() => onNavigate('CLIENTES')}
-              className={tileClass}
+              disabled={isLockedForCashier}
+              onClick={() => {
+                if (!isLockedForCashier) {
+                  onNavigate('CLIENTES');
+                }
+              }}
+              className={isLockedForCashier ? lockedTileClass : tileClass}
+              title={
+                isLockedForCashier
+                  ? 'Debes abrir caja para consultar y facturar a clientes'
+                  : 'Gestión de clientes y descuentos CRM'
+              }
             >
-              <span className="text-xs sm:text-[13px] font-bold text-[#1B5E91] dark:text-sky-300 leading-snug">
+              {isLockedForCashier && (
+                <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-200/90 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                  <Lock className="h-3 w-3" />
+                </div>
+              )}
+              <span
+                className={`text-xs sm:text-[13px] font-bold leading-snug ${
+                  isLockedForCashier
+                    ? 'text-slate-500 dark:text-slate-400'
+                    : 'text-[#1B5E91] dark:text-sky-300'
+                }`}
+              >
                 Clientes
                 <br />
-                <span className="text-[11px] font-normal text-[#2D6DA3] dark:text-sky-400/80">
+                <span
+                  className={`text-[11px] font-normal ${
+                    isLockedForCashier
+                      ? 'text-slate-400 dark:text-slate-500'
+                      : 'text-[#2D6DA3] dark:text-sky-400/80'
+                  }`}
+                >
                   (CRM Descuentos)
                 </span>
               </span>
+              {isLockedForCashier && (
+                <span className="mt-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                  <Lock className="h-2.5 w-2.5" /> Requiere Caja
+                </span>
+              )}
             </button>
 
             {!isCrmOnly && (
               <button
                 type="button"
-                onClick={() => onNavigate('APERTURA_CAJA', 'CAJAS')}
-                className={tileClass}
+                disabled={isLockedForCashier}
+                onClick={() => {
+                  if (!isLockedForCashier) {
+                    onNavigate('APERTURA_CAJA', 'CAJAS');
+                  }
+                }}
+                className={isLockedForCashier ? lockedTileClass : tileClass}
+                title={
+                  isLockedForCashier
+                    ? 'Usa la tarjeta principal "Abrir Caja" para iniciar tu turno'
+                    : 'Control de cajas y registro de gastos'
+                }
               >
-                <span className="text-xs sm:text-[13px] font-bold text-[#1B5E91] dark:text-sky-300 leading-snug">
+                {isLockedForCashier && (
+                  <div className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-200/90 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                    <Lock className="h-3 w-3" />
+                  </div>
+                )}
+                <span
+                  className={`text-xs sm:text-[13px] font-bold leading-snug ${
+                    isLockedForCashier
+                      ? 'text-slate-500 dark:text-slate-400'
+                      : 'text-[#1B5E91] dark:text-sky-300'
+                  }`}
+                >
                   Tesorería
                   <br />
-                  <span className="text-[11px] font-normal text-[#2D6DA3] dark:text-sky-400/80">
+                  <span
+                    className={`text-[11px] font-normal ${
+                      isLockedForCashier
+                        ? 'text-slate-400 dark:text-slate-500'
+                        : 'text-[#2D6DA3] dark:text-sky-400/80'
+                    }`}
+                  >
                     (Cajas / Gastos)
                   </span>
                 </span>
+                {isLockedForCashier && (
+                  <span className="mt-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                    <Lock className="h-2.5 w-2.5" /> Requiere Caja
+                  </span>
+                )}
               </button>
             )}
 
